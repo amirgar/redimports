@@ -1,0 +1,243 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from django.db.models import Q
+
+from .models import (
+    Category, ProductType, Product, Brand,
+    Cart, CartItem, Saved
+)
+from .serializers import (
+    CategorySerializer, ProductTypeSerializer,
+    ProductSerializer, BrandSerializer,
+    CartSerializer, SavedSerializer
+)
+
+# --------------------------
+# Категории / Товары / Бренды
+# --------------------------
+class CategoryListView(APIView):
+    def get(self, request):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(
+            categories,
+            many=True,
+            context={'request': request}
+        )
+        return Response(serializer.data)
+
+
+class ProductTypeByCategoryView(APIView):
+    def get(self, request, category_id):
+        types = ProductType.objects.filter(category_id=category_id)
+        serializer = ProductTypeSerializer(types, many=True)
+        return Response(serializer.data)
+
+
+class ProductByTypeView(APIView):
+    def get(self, request, type_id):
+        products = Product.objects.filter(product_type_id=type_id)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+class ProductDetailView(APIView):
+    def get(self, request, product_id):
+        product = Product.objects.get(id=product_id)
+        serializer = ProductSerializer(product)
+        return Response(serializer.data)
+
+
+class BrandListView(APIView):
+    def get(self, request):
+        brands = Brand.objects.all()
+        serializer = BrandSerializer(brands, many=True, context={'request': request})
+        return Response(serializer.data)
+
+
+
+class ProductsByBrandView(APIView):
+    def get(self, request, brand_id):
+        products = Product.objects.filter(brand_id=brand_id)
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+# --------------------------
+# Поиск / Фильтры
+# --------------------------
+class ProductSearchView(APIView):
+    def get(self, request):
+        products = Product.objects.all()
+
+        # Поиск по имени/описанию
+        query = request.GET.get('q')
+        if query:
+            products = products.filter(
+                Q(name__icontains=query) |
+                Q(description__icontains=query)
+            )
+
+        # Фильтр по бренду
+        brand_id = request.GET.get('brand')
+        if brand_id:
+            products = products.filter(brand_id=brand_id)
+
+        # Фильтр по категории
+        category_id = request.GET.get('category')
+        if category_id:
+            products = products.filter(product_type__category_id=category_id)
+
+        # Фильтр по цене
+        min_price = request.GET.get('min_price')
+        max_price = request.GET.get('max_price')
+        if min_price:
+            products = products.filter(price__gte=min_price)
+        if max_price:
+            products = products.filter(price__lte=max_price)
+
+        serializer = ProductSerializer(products, many=True)
+        return Response(serializer.data)
+
+
+# --------------------------
+# Saved (Избранное)
+# --------------------------
+class SavedListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        saved_items = Saved.objects.filter(user=request.user).order_by('-created_at')
+        serializer = SavedSerializer(saved_items, many=True)
+        return Response(serializer.data)
+
+
+class SavedAddView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        product_id = request.data.get('product_id')
+        if not product_id:
+            return Response({'error': 'product_id required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        saved, created = Saved.objects.get_or_create(user=request.user, product=product)
+        return Response({'added': created})
+
+
+class SavedRemoveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, product_id):
+        try:
+            saved = Saved.objects.get(user=request.user, product_id=product_id)
+            saved.delete()
+            return Response({'removed': True})
+        except Saved.DoesNotExist:
+            return Response({'removed': False})
+
+
+# --------------------------
+# Cart (Корзина)
+# --------------------------
+class CartView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        serializer = CartSerializer(cart)
+        return Response(serializer.data)
+
+
+class CartAddView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, product_id):
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        product = Product.objects.get(id=product_id)
+
+        item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+        if not created:
+            item.quantity += 1
+            item.save()
+
+        return Response({"added": True})
+
+
+class CartRemoveView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, product_id):
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+        CartItem.objects.filter(cart=cart, product_id=product_id).delete()
+        return Response({"deleted": True})
+
+
+class CartUpdateQuantityView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, product_id):
+        quantity = int(request.data.get("quantity", 1))
+        cart, _ = Cart.objects.get_or_create(user=request.user)
+
+        try:
+            item = CartItem.objects.get(cart=cart, product_id=product_id)
+            item.quantity = max(1, quantity)
+            item.save()
+            return Response({"updated": True})
+        except CartItem.DoesNotExist:
+            return Response({"error": "Item not in cart"}, status=status.HTTP_404_NOT_FOUND)
+
+
+# --------------------------
+# Order (Создание заказа)
+# --------------------------
+class OrderCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        cart, _ = Cart.objects.get_or_create(user=user)
+
+        if not cart.items.exists():
+            return Response({"error": "Cart is empty"}, status=400)
+
+        data = request.data
+        required_fields = ['first_name', 'last_name', 'phone', 'address', 'delivery_type', 'payment_method']
+        for field in required_fields:
+            if field not in data:
+                return Response({"error": f"{field} is required"}, status=400)
+
+        order = Order.objects.create(
+            user=user,
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            middle_name=data.get('middle_name', ''),
+            phone=data['phone'],
+            address=data['address'],
+            delivery_type=data['delivery_type'],
+            payment_method=data['payment_method'],
+            total_price=cart.total_price()
+        )
+
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                price=item.product.discount_price or item.product.price,
+                quantity=item.quantity
+            )
+
+        cart.items.all().delete()
+        serializer = OrderSerializer(order)
+        return Response(serializer.data, status=201)
+
+from django.views.generic import TemplateView
+
+class HomePageView(TemplateView):
+    template_name = "catalog/home.html"
