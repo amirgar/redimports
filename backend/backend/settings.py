@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "bendor-garam.amvera.io",
-    "127.0.0.1",
+    # "127.0.0.1",
     "0.0.0.0",
     "localhost",
 ]
@@ -35,7 +35,8 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://bendor-garam.amvera.io",
     "http://localhost",
-    "http://127.0.0.1",
+    "http://0.0.0.0",
+    # "http://127.0.0.1",
 ]
 
 
