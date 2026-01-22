@@ -25,7 +25,18 @@ SECRET_KEY = "django-insecure-+q1(7t9!zb50=j1foy%)d6k(sz#zc_f6p2k63_sxygc%8yz*o&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "bendor-garam.amvera.io",
+    "127.0.0.1",
+    "0.0.0.0",
+    "localhost",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://bendor-garam.amvera.io",
+    "http://localhost",
+    "http://127.0.0.1",
+]
 
 
 # Application definition
