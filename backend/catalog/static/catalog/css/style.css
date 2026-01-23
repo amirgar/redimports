@@ -407,3 +407,24 @@ html, body {
     flex-direction: column;
     justify-content: center;
 }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.app-container {
+    height: 100vh;
+    height: 100dvh; /* 🔥 важно для мобильных */
+    display: flex;
+    flex-direction: column;
+}
+
+.scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain; /* 🔥 убирает «протяжку» */
+}
