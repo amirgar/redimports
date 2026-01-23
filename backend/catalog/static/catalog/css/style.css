@@ -275,7 +275,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding-top: 12.5px;
+    padding-top: 20px;
     flex: 1; /* Чтобы каждая иконка занимала равную ширину */
 }
 
