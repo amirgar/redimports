@@ -27,7 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "redimports-django-garam.amvera.io",
-    # "127.0.0.1",
+    "127.0.0.1",
     "0.0.0.0",
     "localhost",
 ]
@@ -36,7 +36,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://redimports-django-garam.amvera.io/",
     "http://localhost",
     "http://0.0.0.0",
-    # "http://127.0.0.1",
+    "http://127.0.0.1",
 ]
 
 

@@ -285,158 +285,199 @@
             border: 1px solid white;
         }
 
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%; /* Жесткая высота */
+            overflow: hidden; /* Запрещаем скролл всей страницы */
+            overscroll-behavior: none; /* Убирает "пружинку" (rubber-banding) на iOS */
+            background-color: var(--white);
+        }
+
+        /* Контейнер-обертка для всего приложения */
+        .app-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh; /* Высота экрана */
+            /* Используем переменную телеграма для точной высоты, если доступна, иначе 100vh */
+            height: var(--tg-viewport-stable-height, 100vh); 
+        }
+
+        /* Область, которая должна прокручиваться */
+        .scrollable-content {
+            flex: 1; /* Занимает всё доступное место между шапкой и подвалом */
+            overflow-y: auto; /* Включаем вертикальный скролл */
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+            padding-bottom: 20px;
+        }
+
+        /* Убираем position: fixed/sticky у шапки и подвала, так как Flexbox их и так держит */
+        .header {
+            flex-shrink: 0; /* Шапка не сжимается */
+            background: #fff;
+            z-index: 10;
+            /* position: sticky тут больше не нужен, если header лежит прямо во flex-контейнере */
+        }
+
+        .bottom-fixed-container {
+            flex-shrink: 0; /* Подвал не сжимается */
+            background: #fff;
+            z-index: 20;
+            /* position: fixed можно убрать, теперь он просто внизу флекс-контейнера */
+        }
     </style>
 </head>
 <body>
+    <div class="app-container">
+        <header class="header">
+            <div class="search-bar">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" class="search-input" placeholder="ПОИСК">
+            </div>
+        </header>
 
-    <header class="header">
-        <div class="search-bar">
-            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="11" cy="11" r="8"></circle>
-                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-            </svg>
-            <input type="text" class="search-input" placeholder="ПОИСК">
+        <div class="top-slider">
+            <div class="banner-card" style="background-color: #FFA500;">
+                <img src="https://via.placeholder.com/200x100/FFA500/FFFFFF?text=Jacket" alt="">
+            </div>
+            <div class="banner-card" style="background-color: #808080;">
+                <img src="https://via.placeholder.com/200x100/CCCCCC/000000?text=Shoes" alt="">
+            </div>
+            <div class="banner-card" style="background-color: #505050;">
+                <img src="https://via.placeholder.com/200x100/555555/FFFFFF?text=More" alt="">
+            </div>
         </div>
-    </header>
 
-    <div class="top-slider">
-        <div class="banner-card" style="background-color: #FFA500;">
-             <img src="https://via.placeholder.com/200x100/FFA500/FFFFFF?text=Jacket" alt="">
+        <div class="section-header">
+            <div class="section-title">НОВИНКИ</div>
+            <div class="item-count">256 ></div>
         </div>
-        <div class="banner-card" style="background-color: #808080;">
-             <img src="https://via.placeholder.com/200x100/CCCCCC/000000?text=Shoes" alt="">
+
+        <div class="product-grid">
+            
+            <div class="product-card">
+                <div class="image-wrapper">
+                    <button class="like-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
+                    <div class="badge-new">NEW</div>
+                </div>
+                <div class="product-info">
+                    <div class="price-row">
+                        <span class="old-price">899</span>
+                        <span class="new-price">899 ₽</span>
+                    </div>
+                    <div class="brand-name">nike</div>
+                    <div class="product-name">ботинки резиновые</div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="image-wrapper">
+                    <button class="like-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot+2" class="product-img" alt="Nike Shoe">
+                    <div class="badge-new">NEW</div>
+                </div>
+                <div class="product-info">
+                    <div class="price-row">
+                        <span class="old-price">899</span>
+                        <span class="new-price">899 ₽</span>
+                    </div>
+                    <div class="brand-name">nike</div>
+                    <div class="product-name">ботинки резиновые</div>
+                </div>
+            </div>
+
+            <div class="product-card">
+                <div class="image-wrapper">
+                    <button class="like-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
+                    <div class="badge-new">NEW</div>
+                </div>
+                <div class="product-info">
+                    <div class="price-row">
+                        <span class="old-price">1200</span>
+                        <span class="new-price">999 ₽</span>
+                    </div>
+                    <div class="brand-name">nike</div>
+                    <div class="product-name">кроссовки зимние</div>
+                </div>
+            </div>
+            
+            <div class="product-card">
+                <div class="image-wrapper">
+                    <button class="like-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                    </button>
+                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
+                    <div class="badge-new">NEW</div>
+                </div>
+                <div class="product-info">
+                    <div class="price-row">
+                        <span class="old-price">1500</span>
+                        <span class="new-price">1100 ₽</span>
+                    </div>
+                    <div class="brand-name">nike</div>
+                    <div class="product-name">ботинки спорт</div>
+                </div>
+            </div>
         </div>
-        <div class="banner-card" style="background-color: #505050;">
-             <img src="https://via.placeholder.com/200x100/555555/FFFFFF?text=More" alt="">
+
+        <div class="bottom-fixed-container">
+            <div class="promo-strip">
+                Скидка до -25% по промокодку WinterSale
+            </div>
+
+            <nav class="nav-bar">
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </div>
+                </div>
+                <div class="nav-item active-logo">
+                    <div class="icon-box">
+                        <svg viewBox="0 0 24 24" stroke="white" stroke-width="3">
+                            <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </div>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
+                    </div>
+                    <div class="cart-badge">1</div>
+                </div>
+            </nav>
         </div>
     </div>
-
-    <div class="section-header">
-        <div class="section-title">НОВИНКИ</div>
-        <div class="item-count">256 ></div>
-    </div>
-
-    <div class="product-grid">
-        
-        <div class="product-card">
-            <div class="image-wrapper">
-                <button class="like-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
-                <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                <div class="badge-new">NEW</div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="old-price">899</span>
-                    <span class="new-price">899 ₽</span>
-                </div>
-                <div class="brand-name">nike</div>
-                <div class="product-name">ботинки резиновые</div>
-            </div>
-        </div>
-
-        <div class="product-card">
-            <div class="image-wrapper">
-                <button class="like-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
-                <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot+2" class="product-img" alt="Nike Shoe">
-                <div class="badge-new">NEW</div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="old-price">899</span>
-                    <span class="new-price">899 ₽</span>
-                </div>
-                <div class="brand-name">nike</div>
-                <div class="product-name">ботинки резиновые</div>
-            </div>
-        </div>
-
-         <div class="product-card">
-            <div class="image-wrapper">
-                <button class="like-btn">
-                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
-                <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                <div class="badge-new">NEW</div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="old-price">1200</span>
-                    <span class="new-price">999 ₽</span>
-                </div>
-                <div class="brand-name">nike</div>
-                <div class="product-name">кроссовки зимние</div>
-            </div>
-        </div>
-        
-         <div class="product-card">
-            <div class="image-wrapper">
-                <button class="like-btn">
-                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                    </svg>
-                </button>
-                <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                <div class="badge-new">NEW</div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="old-price">1500</span>
-                    <span class="new-price">1100 ₽</span>
-                </div>
-                <div class="brand-name">nike</div>
-                <div class="product-name">ботинки спорт</div>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="bottom-fixed-container">
-        <div class="promo-strip">
-            Скидка до -25% по промокодку WinterSale
-        </div>
-
-        <nav class="nav-bar">
-            <div class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                </div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                </div>
-            </div>
-            <div class="nav-item active-logo">
-                <div class="icon-box">
-                    <svg viewBox="0 0 24 24" stroke="white" stroke-width="3">
-                        <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                </div>
-            </div>
-            <div class="nav-item">
-                <div class="nav-icon">
-                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                </div>
-                <div class="cart-badge">1</div>
-            </div>
-        </nav>
-    </div>
-
     <script>
         // Инициализация Telegram Web App
         const tg = window.Telegram.WebApp;
@@ -450,6 +491,14 @@
         // Можно настроить цвета шапки Telegram под наш дизайн
         tg.setHeaderColor('#FFFFFF'); 
         tg.setBackgroundColor('#FFFFFF'); 
+
+        tg.ready();
+        tg.expand(); // Разворачивает на всю высоту
+
+        // Блокирует вертикальный свайп, чтобы приложение не закрывалось случайно (только для последних версий Telegram)
+        if (tg.isVersionAtLeast('7.7')) {
+            tg.disableVerticalSwipes();
+        }
     </script>
 </body>
 </html>
