@@ -216,3 +216,171 @@ html, body {
     border-radius: 50%; display: flex; justify-content: center; align-items: center;
     border: 2px solid #fff; font-weight: bold;
 }
+
+/* --- 8. РАЗДЕЛ ТОВАРОВ (НОВИНКИ) --- */
+.products-section {
+    padding: 20px 16px;
+}
+
+.products-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.products-title {
+    font-family: 'TT Firs Neue';
+    font-size: 28px;
+    font-weight: 400;
+    text-transform: uppercase;
+    margin: 0;
+    color: #323232;
+}
+
+.products-count {
+    font-family: 'TT Firs Neue';
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #D1D1D6;
+    font-size: 18px;
+}
+
+/* Сетка товаров */
+.products-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Две колонки */
+    gap: 16px;
+}
+
+.product-card {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Контейнер для изображения товара */
+/* Контейнер картинки товара */
+/* .product-image-container {
+    position: relative;
+    width: 100%;               
+    max-width: 185px;          
+    aspect-ratio: 185 / 240;
+    overflow: hidden;
+    border-radius: 4px;
+
+    background-color: #E9EDEE;
+    background-image: url("{% static 'catalog/img/boots.png' %}");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    background-image: 100%;
+    height: 100%;
+
+    border-radius: 4px;
+    overflow: hidden;
+} */
+.product-image-container {
+    position: relative;
+    width: 185px;
+    aspect-ratio: 185 / 240;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.product-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;   /* 🔥 идеально */
+}
+
+
+
+/* Иконка сердечка (справа сверху) */
+.wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px; /* Фиксированный отступ от края */
+    background: none;
+    border: none;
+    padding: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Точки пагинации (справа снизу) */
+.pagination-dots {
+    position: absolute;
+    bottom: 12px;
+    right: 12px; /* Фиксированный отступ от края */
+    display: flex;
+    gap: 4px;
+    z-index: 10;
+}
+
+.dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #D1D1D6;
+}
+
+.dot.active {
+    background: #323232;
+}
+
+/* Бейджик NEW (слева снизу) */
+.badge-new {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    background: #76D672; /* Зеленый из макета */
+    color: #fff;
+    padding: 4px 8px;
+    font-family: 'SF Pro Text', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Инфо о товаре */
+.product-info {
+    padding: 12px 0;
+}
+
+.price-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.old-price {
+    text-decoration: line-through;
+    color: #323232;
+    font-size: 18px;
+    font-family: 'TT Firs Neue';
+}
+
+.current-price {
+    color: #FF3B30; /* Красная цена */
+    font-size: 18px;
+    font-weight: bold;
+    font-family: 'TT Firs Neue';
+}
+
+.brand-name {
+    margin: 0;
+    font-size: 16px;
+    font-family: 'TT Firs Neue';
+    color: #323232;
+}
+
+.product-description {
+    margin: 0;
+    font-size: 14px;
+    color: #8E8E93;
+    font-family: 'TT Firs Neue';
+}
