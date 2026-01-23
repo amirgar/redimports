@@ -2,18 +2,24 @@ const tg = window.Telegram.WebApp;
 tg.ready();
 tg.expand();
 
-// Фиксируем высоту, чтобы клавиатура не поднимала весь интерфейс
-const overflow = 100; // запас
-document.body.style.overflow = 'hidden';
-document.body.style.height = window.innerHeight + 'px';
-document.documentElement.style.height = window.innerHeight + 'px';
+// Принудительно отключаем вертикальный свайп для закрытия Mini App
+tg.isVerticalSwipesEnabled = false; 
 
-// Настройка цветов
+// Устанавливаем цвета
 tg.setHeaderColor('#F2F2F2');
 tg.setBackgroundColor('#F2F2F2');
 
-// Обработка клавиатуры для Android/iOS
-window.visualViewport.addEventListener('resize', () => {
-    // При открытии клавиатуры мы не даем app-container уменьшаться
-    document.querySelector('.app-container').style.height = window.innerHeight + 'px';
-});
+// Фикс для клавиатуры: предотвращаем изменение высоты viewport
+if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', () => {
+        // Оставляем высоту контейнера неизменной
+        document.querySelector('.app-container').style.height = window.innerHeight + 'px';
+    });
+}
+
+// Запрещаем прокрутку всего документа (оставляем только для .scrollable-content)
+document.addEventListener('touchmove', function (e) {
+    if (!e.target.closest('.scrollable-content')) {
+        e.preventDefault();
+    }
+}, { passive: false });
