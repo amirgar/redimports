@@ -5,25 +5,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Red Imports Store</title>
-    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=3.1">
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="app-container">
+        <header class="custom-header">
+            <div class="header-content">
+                <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
+                <span class="header-logo-text">red imports</span>
+            </div>
+        </header>
 
         <main class="scrollable-content">
-            <div class="custom-header">
-                <div class="header-content">
-                    <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
-                    <span class="header-logo-text">red imports</span>
-                </div>
-            </div>
             <section class="hero-banner">
-
                 <div class="hero-bg-container">
                     <img src="{% static 'catalog/img/hero.jpg' %}" class="hero-bg-img">
                 </div>
-                
                 <div class="hero-content">
                     <div class="hero-text">
                         <h1>winter<br>2026</h1>
@@ -37,7 +35,7 @@
 
             <div class="stories-container">
                 <div class="story-item">
-                    <div class="story-circle active"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
+                    <div class="story-circle"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
                     <span>Winter 2026</span>
                 </div>
                 <div class="story-item">
@@ -57,38 +55,67 @@
             <div class="search-section">
                 <div class="search-bar">
                     <input type="text" placeholder="Поиск">
-                    
-                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
                         <circle cx="14" cy="14" r="10" stroke="black" stroke-width="1.2"/>
                         <path d="M27 27L21 21" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
                     </svg>
                 </div>
             </div>
 
-            <div class="section-label">КАТЕГОРИИ</div>
-            <div class="categories-grid">
+            <div class="categories-section">
+                <div class="categories-header">
+                    <h2 class="categories-title">категории</h2>
+                    <div class="categories-count">
+                        <span>10</span>
+                        <div class="arrow-container">
+                            <svg class="arrow-icon" viewBox="0 0 12 12" fill="none">
+                                <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </div>
                 </div>
 
-            <div style="height: 100px;"></div> </main>
+                <div class="categories-scroll">
+                    <div class="category-card">
+                        <span class="category-name">куртки</span>
+                        <img src="{% static 'catalog/img/jacket.png' %}" class="category-img" alt="куртки">
+                    </div>
+                    <div class="category-card">
+                        <span class="category-name">кроссы</span>
+                        <img src="{% static 'catalog/img/sneakers.png' %}" class="category-img" alt="кроссы">
+                    </div>
+                </div>
+            </div>
 
-        <div class="bottom-fixed-container">
+            <div class="scroll-spacer"></div>
+        </main>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+
+        <footer class="bottom-fixed-container">
             <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
             <nav class="nav-bar">
-                <div class="nav-item"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="40"></div>
-                <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="40"></div>
-                
-                <div class="nav-item">
-                    <img src="{% static 'catalog/img/logo_red.svg' %}" width="40"> 
-                    </div>
-
-                <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="40"></div>
-                
-                <div class="nav-item">
-                    <img src="{% static 'catalog/img/cart_icon.svg' %}" width="40">
-                </div>
+                <div class="nav-item"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
+                <div class="nav-item logo-box"><img src="{% static 'catalog/img/logo_red.svg' %}" width="28"></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
             </nav>
-        </div>
+        </footer>
     </div>
 
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.setHeaderColor('#F2F2F2');
+        tg.setBackgroundColor('#F2F2F2');
+    </script>
 </body>
 </html>

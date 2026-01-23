@@ -1,553 +1,218 @@
-/* --- 1. ШРИФТЫ (ОТФ) --- */
-@font-face {
-    font-family: 'TT Firs Neue';
-    src: url('../fonts/TTFirsNeue-Medium.ttf') format('opentype');
-    font-weight: 500;
-}
-@font-face {
-    font-family: 'SF Regular Text';
-    src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype');
-    font-weight: 400;
-}
-@font-face {
-    font-family: 'SF Pro Text';
-    src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
-    font-weight: 700;
-}
+/* --- 1. ШРИФТЫ --- */
+@font-face { font-family: 'TT Firs Neue'; src: url('../fonts/TTFirsNeue-Medium.ttf') format('opentype'); font-weight: 500; }
+@font-face { font-family: 'TT Firs Neue'; src: url('../fonts/TTFirsNeue-Light.ttf') format('truetype'); font-weight: 400; }
+@font-face { font-family: 'SF Pro Text'; src: url('../fonts/SF-Pro-Display-Regular.otf') format('opentype'); font-weight: 700; }
+@font-face { font-family: 'T3-Reg'; src: url('../fonts/T3-Regular.otf') format('opentype'); font-weight: 400; }
 
-@font-face {
-    font-family: 'TH1-reg';
-    src: url('../fonts/TTFirsNeue-Light.ttf') format('truetype'); /* Если есть Regular.otf, лучше укажи его */
-    font-weight: 400;
-}
+/* --- 2. БАЗОВЫЕ СТИЛИ И ФИКСАЦИЯ ОКНА --- */
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-@font-face {
-    font-family: 'T3-Reg';
-    /* Убедись, что файл называется именно так и лежит в папке fonts */
-    src: url('../fonts/T3-Regular.otf') format('opentype'); 
-    font-weight: 400;
-}
-
-/* --- 2. ОБЩИЕ СТИЛИ --- */
-* { box-sizing: border-box; }
 html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    /* Запрещаем любой скролл на уровне всей страницы */
-    overflow: hidden; 
-    position: fixed;
-    background-color: #F2F2F2;
-    /* Убираем системные отскоки (bounce) в Safari */
-    -webkit-overflow-scrolling: none;
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    overflow: hidden; position: fixed; background-color: #F2F2F2;
 }
 
 .app-container {
-    display: flex;
-    flex-direction: column;
-    /* Контейнер строго равен высоте окна Telegram */
-    height: 100vh;
-    height: 100dvh; 
-    width: 100%;
-    position: relative;
-    overflow: hidden;
+    display: flex; flex-direction: column;
+    height: 100vh; height: 100dvh; width: 100%;
 }
 
 .scrollable-content {
-    flex: 1;
-    /* Только здесь разрешен скролл контента */
-    overflow-y: auto;
-    overflow-x: hidden;
-    -webkit-overflow-scrolling: touch;
-    /* Убираем эффект растягивания при скролле (overscroll) */
-    overscroll-behavior-y: contain; 
+    flex: 1; overflow-y: auto; overflow-x: hidden;
+    -webkit-overflow-scrolling: touch; overscroll-behavior-y: contain;
 }
 
-/* --- 3. HERO БАННЕР (482px) --- */
-.hero-banner {
-    position: relative;
-    height: 450px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Центрирует Winter 2026 */
-    padding: 0 24px;
-}
-
-.header-logo {
-    position: absolute;
-    top: 20px; left: 0; right: 0;
+/* --- 3. ШАПКА --- */
+.custom-header {
+    width: 100%; background-color: #F2F2F2;
     display: flex; justify-content: center; align-items: center;
-    gap: 10px; z-index: 10;
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    z-index: 1000; flex-shrink: 0;
+}
+.header-content { display: flex; align-items: center; gap: 8px; }
+.header-logo-img { width: 24px; height: auto; }
+.header-logo-text {
+    font-family: 'TT Firs Neue', sans-serif; font-weight: 500;
+    font-size: 20px; letter-spacing: -0.01em; text-transform: lowercase;
 }
 
-.logo-icon { width: 28px; height: 28px; }
-.logo-text { font-weight: 700; font-size: 22px; color: #323232; letter-spacing: -0.5px; }
-
-.hero-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-.hero-bg-img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
-
-.hero-content { position: relative; z-index: 2; margin-top: 40px; }
+/* --- 4. HERO БАННЕР --- */
+.hero-banner { position: relative; height: 482px; width: 100%; overflow: hidden; }
+.hero-bg-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+.hero-bg-img { width: 100%; height: 100%; object-fit: cover; }
+.hero-content { position: relative; z-index: 2; height: 100%; display: flex; align-items: center; padding: 0 24px; }
 .hero-text h1 {
-    font-family: 'TT Firs Neue';
-    font-size: 72px; line-height: 57px;
-    font-weight: 300;
-    text-transform: uppercase; margin: 0;
-    color: #323232; letter-spacing: -2px;
+    font-family: 'TT Firs Neue'; font-size: 72px; line-height: 0.8;
+    color: #323232;
+    font-weight: 500; text-transform: uppercase; margin: 0; letter-spacing: -2px;
 }
-.promo-text {
-    font-family: 'SF Pro Text', sans-serif;
-    font-size: 20px; line-height: 1.3;
-    margin-top: 15px; color: #323232;
-}
-.discount { font-weight: 700; }
+.promo-text { font-family: 'SF Pro Text', sans-serif; font-size: 20px; margin-top: 15px; color: #323232; }
 
-.slider-dots {
-    position: absolute; bottom: 30px; left: 24px;
-    display: flex; gap: 6px; z-index: 2;
-}
-.dot { width: 8px; height: 2px; background: rgba(0,0,0,0.15); border-radius: 2px; }
-.dot.active { background: #FF3B30; width: 16px; }
-
+/* --- 5. СТОРИЗ --- */
 /* --- 4. СТОРИЗ --- */
 .stories-container {
-    display: flex; gap: 16px; padding: 24px 16px;
-    overflow-x: auto; scrollbar-width: none;
+    display: flex;
+    gap: 16px;
+    padding: 24px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
 }
 .stories-container::-webkit-scrollbar { display: none; }
 
 .story-item {
-    display: flex; flex-direction: column; align-items: center;
-    min-width: 80px; text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    text-align: center;
 }
+
 .story-circle {
     width: 72px;
     height: 72px;
     border-radius: 50%;
-    border: 2px solid #FF3B30; /* Делаем границу красной для всех по умолчанию */
+    border: 2px solid #FF3B30;
     padding: 3px;
     margin-bottom: 8px;
     background-color: #fff;
+    overflow: hidden;
 }
 
-/* Убираем зависимость от класса .active, так как теперь все красные */
 .story-circle img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
 }
-.story-item span { font-size: 11px; color: #323232; line-height: 1.2; }
 
+/* Исправленный шрифт для подписей */
 .story-item span {
-    font-family: 'T3-Reg', sans-serif;
-    font-size: 12px; /* Чуть увеличил для читаемости нового шрифта */
+    /* Применяем кастомный шрифт с запасными вариантами */
+    font-family: 'T3-Reg', 'SF Pro Text', -apple-system, sans-serif;
+    font-size: 12px;
     color: #323232;
     line-height: 1.2;
-    margin-top: 8px; /* Отступ от кружка */
-}
-
-/* --- 5. ПОИСК (Левее, больше, тоньше) --- */
-.search-section {
-    padding: 20px 16px;
-    margin-bottom: 10px;
-}
-
-.search-bar {
-    background: transparent;
-    display: flex;
-    align-items: center; /* Выравниваем по центру */
-    border-bottom: 1px solid #32323280;
-    padding-bottom: 10px;
-    gap: 16px; /* Отступ между значком и текстом */
-}
-
-/* Стили для иконки поиска */
-.search-icon-svg {
-    /* Увеличили размер с 24px до 32px */
-    width: 32px;
-    height: 32px;
-    /* Убрали прозрачность, чтобы тонкие линии были четкими */
-    opacity: 1; 
-    flex-shrink: 0; /* Чтобы иконка не сжималась */
-}
-
-.search-bar input {
-    background: transparent;
-    border: none;
-    outline: none;
-    /* Шрифт TH1-reg из прошлого запроса */
-    font-family: 'TH1-reg', sans-serif;
-    font-size: 48px;
+    margin-top: 4px; /* Отступ от кружка */
     font-weight: 400;
-    color: #000;
-    flex-grow: 1; /* Занимает все оставшееся место */
-    letter-spacing: -1px;
 }
 
-/* --- 5. ПОИСК --- */
-.search-section {
-    padding: 20px 16px; /* Увеличили отступы */
-    margin-bottom: 10px;
+/* --- 6. ПОИСК --- */
+.search-section { padding: 10px 16px; margin-bottom: 20px; }
+.search-bar { 
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid #32323240; padding-bottom: 15px;
 }
-
-.search-bar {
-    background: transparent; /* Убираем серый фон, на скрине он белый/прозрачный */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid #F2F2F7; /* Тонкая линия снизу для аккуратности */
-    padding-bottom: 10px;
-}
-
 .search-bar input {
-    background: transparent;
-    border: none;
-    outline: none;
-    /* Тот самый огромный шрифт */
-    font-family: 'TH1-reg', sans-serif;
-    font-size: 48px; /* Огромный размер как на макете */
-    font-weight: 400;
-    color: #000;
-    width: 100%;
-    letter-spacing: -1px;
+    font-family: 'TT Firs Neue', sans-serif; font-size: 48px; border: none;
+    outline: none; background: transparent; width: 100%; letter-spacing: -2px;
+}
+.search-icon-svg { width: 36px; height: 36px; }
+/* --- 7. КАТЕГОРИИ (ИСПРАВЛЕННО) --- */
+.categories-section { 
+    padding: 30px 0; 
+    background: #F2F2F2; 
 }
 
-.search-bar input::placeholder {
-    color: #D1D1D6; /* Светло-серый цвет для placeholder */
+.categories-header { 
+    display: flex; 
+    justify-content: space-between; 
+    padding: 0 16px 15px; 
+    align-items: center; 
 }
 
-.search-icon-svg {
-    width: 24px;
-    height: 24px;
-    opacity: 0.3; /* Делаем иконку менее заметной */
+.categories-title { 
+    font-family: 'TT Firs Neue'; 
+    font-weight: 400; /* Немного жирнее для соответствия макету */
+    font-size: 32px; 
+    letter-spacing: -0.03em; 
+    margin: 0; 
+    color: #323232;
 }
 
-/* --- 6. НИЖНЕЕ МЕНЮ --- */
-.bottom-fixed-container {
-    position: sticky; bottom: 0; width: 100%;
-    background: #fff; z-index: 100;
-}
-.promo-strip {
-    background: #FF3B30; color: #fff; text-align: center;
-    padding: 12px; font-size: 16.5px; font-weight: 700;
-    font-family: "SF Regular Text";
-    letter-spacing: 0.3px;
-}
-.nav-bar {
-    display: flex; justify-content: space-around; align-items: center;
-    height: 65px; 
-    padding-bottom: 30px;
-}
-.active-logo .icon-box {
-    background: #FF3B30; color: #fff;
-    width: 44px; height: 36px; border-radius: 8px;
-    display: flex; justify-content: center; align-items: center;
-}
-.cart-badge {
-    position: absolute; top: 12px; right: 20px;
-    background: #FF3B30; color: #fff; font-size: 10px;
-    width: 16px; height: 16px; border-radius: 50%;
-    display: flex; justify-content: center; align-items: center;
+.categories-count { 
+    font-family: 'TT Firs Neue'; 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+    color: rgba(50, 50, 50, 0.3); /* Цвет 10 и стрелки стал бледнее, как на макете */
+    font-size: 18px; 
 }
 
-/* --- 6. НИЖНЕЕ МЕНЮ (Увеличенное) --- */
-.bottom-fixed-container {
-    position: sticky;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    z-index: 100;
-    /* Тень, чтобы меню отделялось от контента */
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+.categories-scroll { 
+    display: flex; 
+    gap: 12px; 
+    padding: 0 16px; 
+    overflow-x: auto; 
+    scrollbar-width: none; /* Скрываем скроллбар в Firefox */
 }
+.categories-scroll::-webkit-scrollbar { display: none; } /* Скрываем скроллбар в Chrome/Safari */
 
-.nav-bar {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    /* Увеличили высоту до 75px, чтобы иконкам было просторно */
-    height: 75px; 
-    padding-bottom: env(safe-area-inset-bottom); /* Учет челки/полоски на iPhone */
-}
-
-.nav-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding-top: 20px;
-    flex: 1; /* Чтобы каждая иконка занимала равную ширину */
-}
-
-.active-logo {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-.active-logo .icon-box {
-    background: #FF3B30;
-    /* Увеличили размер красного бокса под иконку */
-    width: 52px;
-    height: 42px;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-/* На всякий случай сбросим высоту у картинок, чтобы они не тянулись */
-.nav-bar img {
-    height: auto;
-    display: block;
-}
-
-/* --- 6. НИЖНЕЕ МЕНЮ (МАКСИМАЛЬНО КРУПНОЕ) --- */
-.bottom-fixed-container {
-    position: sticky;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    z-index: 100;
-    border-top: 1px solid #F2F2F7; /* Легкая линия для отделения от контента */
-}
-
-.nav-bar {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    /* Увеличили высоту до 90px для комфорта крупных иконок */
-    height: 90px; 
-    padding-bottom: env(safe-area-inset-bottom); /* Поддержка iPhone Safe Area */
-}
-
-.nav-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    height: 100%;
-}
-
-.nav-item img {
-    display: block;
-    height: auto; /* Сохраняем пропорции при большой ширине */
-}
-
-/* Удаляем старые стили active-logo и icon-box, они больше не нужны */
-.active-logo, .icon-box {
-    background: none !important;
-    width: auto !important;
-    height: auto !important;
-}
-
-/* Если на иконке корзины есть бейдж (цифра), поправим его позицию под новые размеры */
-.cart-badge {
-    position: absolute;
-    top: 15px;
-    right: 15%;
-    background: #FF3B30;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 700;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid #fff;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    /* Фиксируем высоту ровно по размеру экрана */
-    height: 100vh; 
-    height: -webkit-fill-available; /* Важно для iOS */
-    overflow: hidden; /* Запрещаем общий скролл */
-    background-color: #fff;
-}
-
-.app-container {
-    display: flex;
-    flex-direction: column;
-    /* Контейнер всегда равен высоте экрана */
-    height: 100vh;
-    height: -webkit-fill-available;
-}
-
-.scrollable-content {
-    flex: 1; /* Занимает всё свободное место между верхом и меню */
-    overflow-y: auto; /* Скролл только тут */
-    -webkit-overflow-scrolling: touch;
-}
-
-.hero-banner {
-    position: relative;
-    height: 482px;
-    /* Добавляем безопасный отступ сверху для iPhone/Android */
-    padding-top: env(safe-area-inset-top, 20px); 
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.header-logo {
-    position: absolute;
-    /* Теперь top отсчитывается с учетом безопасной зоны */
-    top: calc(env(safe-area-inset-top, 0px) + 15px); 
-    left: 0;
-    right: 0;
-    z-index: 10;
-}
-
-.header-logo {
-    position: absolute;
-    /* Используем системную переменную отступа "челки" */
-    top: env(safe-area-inset-top, 0px); 
-    left: 0;
-    right: 0;
-    height: 44px; /* Стандартная высота нативной шапки */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-    z-index: 999;
-    background: #ffffff; /* Делаем фон логотипа белым */
-}
-
-.hero-banner {
-    position: relative;
-    height: 482px;
-    padding-top: 0; /* Убираем лишние отступы */
-    margin-top: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-html, body {
-    margin: 0;
-    padding: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.app-container {
-    height: 100vh;
-    height: 100dvh; /* 🔥 важно для мобильных */
-    display: flex;
-    flex-direction: column;
-}
-
-.scrollable-content {
-    flex: 1;
-    overflow-y: auto;
-    overscroll-behavior: contain; /* 🔥 убирает «протяжку» */
-}
-
-
-/* --- 5. ПОИСК (Текст слева, иконка справа) --- */
-.search-section {
-    padding: 10px 16px; /* Немного уменьшил вертикальный отступ */
-    margin-bottom: 20px;
-}
-
-.search-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Раскидывает текст и иконку */
-    border-bottom: 1px solid #F2F2F7;
-    padding-bottom: 15px;
-}
-
-.search-bar input {
-    font-family: 'TH1-reg', sans-serif;
-    font-size: 48px;
-    font-weight: 400;
-    color: #000;
-    background: transparent;
-    border: none;
-    outline: none;
-    padding: 0;
-    flex-grow: 1; /* Текст занимает всё место слева */
-}
-
-.search-icon-svg {
-    width: 36px; /* Сделали значок побольше */
-    height: 36px;
+.category-card { 
+    min-width: 175px; /* Увеличили ширину карточки */
+    height: 90px;   /* Увеличили высоту карточки */
+    background: #FFF; 
+    border-radius: 16px; /* Более мягкое скругление */
+    position: relative; 
+    overflow: hidden; 
     flex-shrink: 0;
 }
 
+.category-name { 
+    position: absolute; 
+    top: 15px; 
+    left: 15px; 
+    font-family: 'TT Firs Neue'; 
+    font-weight: 500; 
+    font-size: 15px; /* Чуть крупнее текст */
+    z-index: 5; /* Текст всегда поверх картинки */
+    color: #323232;
+}
 
+.category-card img { 
+    position: absolute; 
+    /* Главное изменение: картинка теперь больше карточки и смещена за её пределы */
+    /* bottom: -15px;  */
+    right: -50px; 
+    width: 110%;  /* Картинка на 10% больше родителя */
+    height: auto; 
+    object-fit: contain; 
+    /* Убираем или уменьшаем поворот, чтобы соответствовать референсу */
+    transform: rotate(10deg); 
+    z-index: 1;
+}
 
-/* --- 6. НИЖНЕЕ МЕНЮ (Увеличенная высота, центрирование) --- */
+.arrow-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.arrow-icon {
+    /* Цвет стрелочки тоже 50% прозрачности */
+    color: rgba(50, 50, 50, 0.5);
+    width: 12px;
+    height: 12px;
+}
+
+/* --- 8. НИЖНЕЕ МЕНЮ --- */
 .bottom-fixed-container {
-    position: relative; /* Внутри flex-контейнера он встанет вниз сам */
-    width: 100%;
-    background: #fff;
-    z-index: 1000;
+    position: fixed; bottom: 0; width: 100%; background: #fff; z-index: 2000;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    /* Учет полоски внизу iPhone, но без лишних добавок */
-    padding-bottom: env(safe-area-inset-bottom, 10px);
+    padding-bottom: env(safe-area-inset-bottom, 20px);
 }
-
-.nav-bar {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    /* Уменьшили высоту со 120px до 85px, чтобы оно стало "ниже" */
-    height: 85px; 
-    background: #ffffff;
+.promo-strip {
+    background: #FF3B30; color: #fff; height: 40px;
+    display: flex; justify-content: center; align-items: center;
+    font-family: 'SF Pro Text'; font-size: 14px; letter-spacing: -0.01em;
 }
-
-.nav-item {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex: 1;
-    height: 100%;
+.nav-bar { display: flex; justify-content: space-around; align-items: center; height: 85px; }
+.nav-item { flex: 1; display: flex; justify-content: center; position: relative; }
+.cart-badge {
+    position: absolute; top: -5px; right: 20%; background: #FF3B30;
+    color: #fff; font-size: 10px; width: 18px; height: 18px;
+    border-radius: 50%; display: flex; justify-content: center; align-items: center;
+    border: 2px solid #fff; font-weight: bold;
 }
-
-/* --- НОВАЯ ШАПКА --- */
-.custom-header {
-    width: 100%;
-    background-color: #F2F2F2; /* Цвет под фон ТГ */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /* Высота стандартной шапки + отступ под челку */
-    height: calc(env(safe-area-inset-top) + 44px);
-    padding-top: env(safe-area-inset-top);
-    position: sticky;
-    top: 0;
-    z-index: 9999;
-}
-
-.header-content {
-    display: flex;
-    align-items: center;
-    gap: 8px; /* Расстояние между стрелкой и текстом */
-}
-
-.header-logo-img {
-    width: 24px; /* Отрегулируй под размер текста */
-    height: auto;
-}
-
-.header-logo-text {
-    /* Твои параметры из Figma */
-    font-family: 'TT Firs Neue', sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 100%;
-    letter-spacing: -0.01em; /* -1% */
-    color: #000;
-    text-transform: lowercase; /* Судя по фото, всё в нижнем регистре */
-}
-
-/* Убираем старый header-logo, если он был */
-.header-logo { display: none !important; }
