@@ -338,3 +338,47 @@ html, body {
     align-items: center;
     border: 2px solid #fff;
 }
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /* Фиксируем высоту ровно по размеру экрана */
+    height: 100vh; 
+    height: -webkit-fill-available; /* Важно для iOS */
+    overflow: hidden; /* Запрещаем общий скролл */
+    background-color: #fff;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    /* Контейнер всегда равен высоте экрана */
+    height: 100vh;
+    height: -webkit-fill-available;
+}
+
+.scrollable-content {
+    flex: 1; /* Занимает всё свободное место между верхом и меню */
+    overflow-y: auto; /* Скролл только тут */
+    -webkit-overflow-scrolling: touch;
+}
+
+.hero-banner {
+    position: relative;
+    height: 482px;
+    /* Добавляем безопасный отступ сверху для iPhone/Android */
+    padding-top: env(safe-area-inset-top, 20px); 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.header-logo {
+    position: absolute;
+    /* Теперь top отсчитывается с учетом безопасной зоны */
+    top: calc(env(safe-area-inset-top, 0px) + 15px); 
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
