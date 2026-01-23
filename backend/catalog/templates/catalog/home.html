@@ -3,51 +3,47 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Red Imports</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=3.1">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}">
 </head>
 <body>
     <div class="app-container">
-        <header class="top-nav">
-            <span class="close-btn">× close</span>
-            <div class="logo">
-                <img src="{% static 'catalog/img/logo.png' %}" alt="red imports">
-                <span>red imports</span>
-            </div>
-            <button class="more-btn">•••</button>
-        </header>
-
         <main class="scrollable-content">
             
             <section class="hero-banner">
-                <div class="hero-text">
-                    <h1>winter<br>2026</h1>
-                    <p><b>-50%</b> на всю обувь<br>с декабря по январь</p>
+
+                <div class="hero-bg-container">
+                    <img src="{% static 'catalog/img/hero.jpg' %}" class="hero-bg-img">
                 </div>
-                <div class="copy-badge">Скопировано ✓</div>
-                <div class="slider-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>winter<br>2026</h1>
+                        <p class="promo-text">
+                            <span class="discount">-50%</span> на всю обувь<br>
+                            с декабря по январь
+                        </p>
+                    </div>
                 </div>
             </section>
 
             <div class="stories-container">
                 <div class="story-item">
-                    <div class="story-circle active"><img src="https://via.placeholder.com/60"></div>
+                    <div class="story-circle active"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
                     <span>Winter 2026</span>
                 </div>
                 <div class="story-item">
-                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <div class="story-circle"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
                     <span>Доставка и оплата</span>
                 </div>
                 <div class="story-item">
-                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <div class="story-circle"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
                     <span>Миссия проекта</span>
                 </div>
                 <div class="story-item">
-                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <div class="story-circle"><img src="{% static 'catalog/img/hero.jpg' %}"></div>
                     <span>Идеи подарка</span>
                 </div>
             </div>
@@ -55,58 +51,43 @@
             <div class="search-section">
                 <div class="search-bar">
                     <input type="text" placeholder="Поиск">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    
+                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="14" cy="14" r="10" stroke="black" stroke-width="1.2"/>
+                        <path d="M27 27L21 21" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
                 </div>
             </div>
 
-            <div class="top-slider">
-                <div class="banner-card" style="background-color: #FFA500;">
-                    <img src="https://via.placeholder.com/200x100?text=Jackets" alt="">
+            <div class="section-label">КАТЕГОРИИ</div>
+            <div class="categories-grid">
                 </div>
-                <div class="banner-card" style="background-color: #808080;">
-                    <img src="https://via.placeholder.com/200x100?text=Shoes" alt="">
-                </div>
-            </div>
 
-            <div class="section-header">
-                <div class="section-title">НОВИНКИ</div>
-                <div class="item-count">256 ></div>
-            </div>
-
-            <div class="product-grid">
-                {% for i in "1234" %}
-                <div class="product-card">
-                    <div class="image-wrapper">
-                        <button class="like-btn">♡</button>
-                        <img src="https://via.placeholder.com/300" class="product-img">
-                        <div class="badge-new">NEW</div>
-                    </div>
-                    <div class="product-info">
-                        <div class="price-row"><span class="old-price">899</span><span class="new-price">899 ₽</span></div>
-                        <div class="brand-name">nike</div>
-                        <div class="product-name">ботинки резиновые</div>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-
-            <div style="height: 100px;"></div>
-        </main>
+            <div style="height: 100px;"></div> </main>
 
         <div class="bottom-fixed-container">
             <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
             <nav class="nav-bar">
-                <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
-                <div class="nav-item active-logo"><div class="icon-box">➔</div></div>
-                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="40"></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="40"></div>
+                
                 <div class="nav-item">
-                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
-                    <div class="cart-badge">1</div>
+                    <img src="{% static 'catalog/img/logo_red.svg' %}" width="40"> 
+                    </div>
+
+                <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="40"></div>
+                
+                <div class="nav-item">
+                    <img src="{% static 'catalog/img/cart_icon.svg' %}" width="40">
                 </div>
             </nav>
         </div>
     </div>
-    <script src="{% static 'catalog/js/script.js' %}"></script>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+    </script>
 </body>
 </html>
