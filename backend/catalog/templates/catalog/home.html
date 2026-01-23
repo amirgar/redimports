@@ -1,504 +1,112 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Shop Mini App</title>
+    <title>Red Imports</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --bg-color: #F2F2F7;
-            --white: #FFFFFF;
-            --text-main: #000000;
-            --text-secondary: #8E8E93;
-            --accent-red: #FF3B30;
-            --accent-green: #34C759;
-            --nav-border: #E5E5EA;
-            --card-bg: #F4F4F4;
-        }
-
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--white);
-            color: var(--text-main);
-            padding-bottom: 120px; /* Отступ под навигацию и промо */
-        }
-
-        /* --- HEADER & SEARCH --- */
-        .header {
-            position: sticky;
-            top: 0;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 10px 16px;
-            z-index: 100;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: #EFEFF4; /* Серый фон инпута */
-            border-radius: 10px;
-            padding: 8px 12px;
-        }
-
-        .search-icon {
-            color: var(--text-secondary);
-            margin-right: 8px;
-        }
-
-        .search-input {
-            border: none;
-            background: transparent;
-            font-size: 17px;
-            width: 100%;
-            outline: none;
-            color: var(--text-main);
-        }
-        
-        .search-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        /* --- TOP BANNER SLIDER --- */
-        .top-slider {
-            display: flex;
-            overflow-x: auto;
-            padding: 10px 16px;
-            gap: 10px;
-            scroll-snap-type: x mandatory;
-        }
-        
-        .top-slider::-webkit-scrollbar {
-            display: none; /* Скрываем скроллбар */
-        }
-
-        .banner-card {
-            min-width: 140px;
-            height: 80px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #eee;
-            position: relative;
-        }
-        
-        .banner-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* --- CATALOG HEADER --- */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            padding: 20px 16px 10px;
-        }
-
-        .section-title {
-            font-size: 28px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .item-count {
-            font-size: 15px;
-            color: var(--text-secondary);
-        }
-
-        /* --- PRODUCT GRID --- */
-        .product-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px 12px;
-            padding: 0 16px;
-        }
-
-        .product-card {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .image-wrapper {
-            background-color: var(--card-bg);
-            border-radius: 16px;
-            position: relative;
-            padding-bottom: 100%; /* Квадрат */
-            margin-bottom: 12px;
-        }
-
-        .product-img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Чтобы обувь помещалась полностью */
-            padding: 15px;
-        }
-
-        .like-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: transparent;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-        }
-
-        .badge-new {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            background-color: var(--accent-green);
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 4px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-        }
-
-        .price-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
-        .old-price {
-            text-decoration: line-through;
-            color: var(--text-main);
-            font-weight: 500;
-            font-size: 15px;
-        }
-
-        .new-price {
-            color: var(--accent-red);
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .brand-name {
-            font-size: 14px;
-            color: var(--text-secondary);
-            margin-bottom: 2px;
-        }
-
-        .product-name {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 400;
-        }
-
-        /* --- FIXED BOTTOM AREA --- */
-        .bottom-fixed-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            z-index: 1000;
-            background: var(--white);
-        }
-
-        /* PROMO STRIP */
-        .promo-strip {
-            background-color: var(--accent-red);
-            color: white;
-            text-align: center;
-            font-size: 13px;
-            padding: 8px;
-            font-weight: 500;
-        }
-
-        /* NAV BAR */
-        .nav-bar {
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            height: 60px; /* Высота таббара */
-            border-top: 1px solid var(--nav-border);
-            padding-bottom: env(safe-area-inset-bottom); /* Для iPhone X+ */
-            background: rgba(255,255,255,0.98);
-        }
-
-        .nav-item {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 20%;
-            height: 100%;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .nav-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: #000;
-            stroke-width: 2;
-        }
-
-        /* Custom styling for the center active logo */
-        .nav-item.active-logo .icon-box {
-            background: var(--accent-red);
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 4px;
-        }
-        
-        .nav-item.active-logo svg {
-            stroke: white;
-            width: 18px;
-            height: 18px;
-        }
-
-        .cart-badge {
-            position: absolute;
-            top: 10px;
-            right: 15px; /* Примерное позиционирование */
-            background-color: var(--accent-red);
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            height: 16px;
-            min-width: 16px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 4px;
-            border: 1px solid white;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%; /* Жесткая высота */
-            overflow: hidden; /* Запрещаем скролл всей страницы */
-            overscroll-behavior: none; /* Убирает "пружинку" (rubber-banding) на iOS */
-            background-color: var(--white);
-        }
-
-        /* Контейнер-обертка для всего приложения */
-        .app-container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh; /* Высота экрана */
-            /* Используем переменную телеграма для точной высоты, если доступна, иначе 100vh */
-            height: var(--tg-viewport-stable-height, 100vh); 
-        }
-
-        /* Область, которая должна прокручиваться */
-        .scrollable-content {
-            flex: 1; /* Занимает всё доступное место между шапкой и подвалом */
-            overflow-y: auto; /* Включаем вертикальный скролл */
-            overflow-x: hidden;
-            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
-            padding-bottom: 20px;
-        }
-
-        /* Убираем position: fixed/sticky у шапки и подвала, так как Flexbox их и так держит */
-        .header {
-            flex-shrink: 0; /* Шапка не сжимается */
-            background: #fff;
-            z-index: 10;
-            /* position: sticky тут больше не нужен, если header лежит прямо во flex-контейнере */
-        }
-
-        .bottom-fixed-container {
-            flex-shrink: 0; /* Подвал не сжимается */
-            background: #fff;
-            z-index: 20;
-            /* position: fixed можно убрать, теперь он просто внизу флекс-контейнера */
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}">
 </head>
 <body>
     <div class="app-container">
-        <header class="header">
-            <div class="search-bar">
-                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-                <input type="text" class="search-input" placeholder="ПОИСК">
+        <header class="top-nav">
+            <span class="close-btn">× close</span>
+            <div class="logo">
+                <img src="{% static 'catalog/img/logo.png' %}" alt="red imports">
+                <span>red imports</span>
             </div>
+            <button class="more-btn">•••</button>
         </header>
 
-        <div class="top-slider">
-            <div class="banner-card" style="background-color: #FFA500;">
-                <img src="https://via.placeholder.com/200x100/FFA500/FFFFFF?text=Jacket" alt="">
-            </div>
-            <div class="banner-card" style="background-color: #808080;">
-                <img src="https://via.placeholder.com/200x100/CCCCCC/000000?text=Shoes" alt="">
-            </div>
-            <div class="banner-card" style="background-color: #505050;">
-                <img src="https://via.placeholder.com/200x100/555555/FFFFFF?text=More" alt="">
-            </div>
-        </div>
-
-        <div class="section-header">
-            <div class="section-title">НОВИНКИ</div>
-            <div class="item-count">256 ></div>
-        </div>
-
-        <div class="product-grid">
+        <main class="scrollable-content">
             
-            <div class="product-card">
-                <div class="image-wrapper">
-                    <button class="like-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </button>
-                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                    <div class="badge-new">NEW</div>
+            <section class="hero-banner">
+                <div class="hero-text">
+                    <h1>winter<br>2026</h1>
+                    <p><b>-50%</b> на всю обувь<br>с декабря по январь</p>
                 </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">899</span>
-                        <span class="new-price">899 ₽</span>
-                    </div>
-                    <div class="brand-name">nike</div>
-                    <div class="product-name">ботинки резиновые</div>
+                <div class="copy-badge">Скопировано ✓</div>
+                <div class="slider-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </section>
+
+            <div class="stories-container">
+                <div class="story-item">
+                    <div class="story-circle active"><img src="https://via.placeholder.com/60"></div>
+                    <span>Winter 2026</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <span>Доставка и оплата</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <span>Миссия проекта</span>
+                </div>
+                <div class="story-item">
+                    <div class="story-circle"><img src="https://via.placeholder.com/60"></div>
+                    <span>Идеи подарка</span>
                 </div>
             </div>
 
-            <div class="product-card">
-                <div class="image-wrapper">
-                    <button class="like-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </button>
-                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot+2" class="product-img" alt="Nike Shoe">
-                    <div class="badge-new">NEW</div>
-                </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">899</span>
-                        <span class="new-price">899 ₽</span>
-                    </div>
-                    <div class="brand-name">nike</div>
-                    <div class="product-name">ботинки резиновые</div>
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" placeholder="Поиск">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
                 </div>
             </div>
 
-            <div class="product-card">
-                <div class="image-wrapper">
-                    <button class="like-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </button>
-                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                    <div class="badge-new">NEW</div>
+            <div class="top-slider">
+                <div class="banner-card" style="background-color: #FFA500;">
+                    <img src="https://via.placeholder.com/200x100?text=Jackets" alt="">
                 </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">1200</span>
-                        <span class="new-price">999 ₽</span>
-                    </div>
-                    <div class="brand-name">nike</div>
-                    <div class="product-name">кроссовки зимние</div>
+                <div class="banner-card" style="background-color: #808080;">
+                    <img src="https://via.placeholder.com/200x100?text=Shoes" alt="">
                 </div>
             </div>
-            
-            <div class="product-card">
-                <div class="image-wrapper">
-                    <button class="like-btn">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
-                        </svg>
-                    </button>
-                    <img src="https://via.placeholder.com/300x300/F4F4F4/000000?text=Nike+Boot" class="product-img" alt="Nike Shoe">
-                    <div class="badge-new">NEW</div>
-                </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">1500</span>
-                        <span class="new-price">1100 ₽</span>
-                    </div>
-                    <div class="brand-name">nike</div>
-                    <div class="product-name">ботинки спорт</div>
-                </div>
+
+            <div class="section-header">
+                <div class="section-title">НОВИНКИ</div>
+                <div class="item-count">256 ></div>
             </div>
-        </div>
+
+            <div class="product-grid">
+                {% for i in "1234" %}
+                <div class="product-card">
+                    <div class="image-wrapper">
+                        <button class="like-btn">♡</button>
+                        <img src="https://via.placeholder.com/300" class="product-img">
+                        <div class="badge-new">NEW</div>
+                    </div>
+                    <div class="product-info">
+                        <div class="price-row"><span class="old-price">899</span><span class="new-price">899 ₽</span></div>
+                        <div class="brand-name">nike</div>
+                        <div class="product-name">ботинки резиновые</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div style="height: 100px;"></div>
+        </main>
 
         <div class="bottom-fixed-container">
-            <div class="promo-strip">
-                Скидка до -25% по промокодку WinterSale
-            </div>
-
+            <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
             <nav class="nav-bar">
+                <div class="nav-item"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg></div>
+                <div class="nav-item active-logo"><div class="icon-box">➔</div></div>
+                <div class="nav-item"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg></div>
                 <div class="nav-item">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                    </div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
-                    </div>
-                </div>
-                <div class="nav-item active-logo">
-                    <div class="icon-box">
-                        <svg viewBox="0 0 24 24" stroke="white" stroke-width="3">
-                            <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
-                    </div>
-                </div>
-                <div class="nav-item">
-                    <div class="nav-icon">
-                        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path><line x1="3" y1="6" x2="21" y2="6"></line><path d="M16 10a4 4 0 0 1-8 0"></path></svg>
-                    </div>
+                    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path></svg>
                     <div class="cart-badge">1</div>
                 </div>
             </nav>
         </div>
     </div>
-    <script>
-        // Инициализация Telegram Web App
-        const tg = window.Telegram.WebApp;
-        
-        // Сообщаем телеграму, что приложение готово
-        tg.ready();
-        
-        // Разворачиваем на всю высоту
-        tg.expand();
-        
-        // Можно настроить цвета шапки Telegram под наш дизайн
-        tg.setHeaderColor('#FFFFFF'); 
-        tg.setBackgroundColor('#FFFFFF'); 
-
-        tg.ready();
-        tg.expand(); // Разворачивает на всю высоту
-
-        // Блокирует вертикальный свайп, чтобы приложение не закрывалось случайно (только для последних версий Telegram)
-        if (tg.isVersionAtLeast('7.7')) {
-            tg.disableVerticalSwipes();
-        }
-    </script>
+    <script src="{% static 'catalog/js/script.js' %}"></script>
 </body>
 </html>
