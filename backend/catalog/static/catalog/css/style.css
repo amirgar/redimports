@@ -382,3 +382,28 @@ html, body {
     right: 0;
     z-index: 10;
 }
+
+.header-logo {
+    position: absolute;
+    /* Используем системную переменную отступа "челки" */
+    top: env(safe-area-inset-top, 0px); 
+    left: 0;
+    right: 0;
+    height: 44px; /* Стандартная высота нативной шапки */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    z-index: 999;
+    background: #ffffff; /* Делаем фон логотипа белым */
+}
+
+.hero-banner {
+    position: relative;
+    height: 482px;
+    padding-top: 0; /* Убираем лишние отступы */
+    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
