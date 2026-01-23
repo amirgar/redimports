@@ -141,7 +141,7 @@ html, body {
     background: transparent;
     display: flex;
     align-items: center; /* Выравниваем по центру */
-    border-bottom: 1px solid #F2F2F7;
+    border-bottom: 1px solid #32323280;
     padding-bottom: 10px;
     gap: 16px; /* Отступ между значком и текстом */
 }
