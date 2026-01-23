@@ -481,52 +481,23 @@ html, body {
 
 
 /* --- 6. НИЖНЕЕ МЕНЮ (Увеличенная высота, центрирование) --- */
-/* --- 6. НИЖНЕЕ МЕНЮ (ИДЕАЛЬНОЕ ЦЕНТРИРОВАНИЕ) --- */
 .bottom-fixed-container {
-    position: fixed;
-    bottom: 0;
+    position: relative; /* Внутри flex-контейнера он встанет вниз сам */
     width: 100%;
     background: #fff;
     z-index: 1000;
-    border-top: 1px solid #F2F2F7;
-    
-    /* Увеличиваем общую высоту всей конструкции */
-    /* Теперь она складывается из: промо-стрипа + безопасной зоны айфона + доп. высоты */
-    padding-bottom: env(safe-area-inset-bottom, 20px); 
-    
-    display: flex;
-    flex-direction: column;
-}
-
-.promo-strip {
-    /* Твои настройки из Figma остаются без изменений */
-    background: #FF3B30;
-    color: #fff;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'SF Pro Text', sans-serif;
-    font-weight: 400;
-    font-size: 14px;
-    line-height: 16px;
-    letter-spacing: -0.01em;
-    height: 40px; 
-    width: 100%;
-    flex-shrink: 0; /* Чтобы полоска не сжималась */
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    /* Учет полоски внизу iPhone, но без лишних добавок */
+    padding-bottom: env(safe-area-inset-bottom, 10px);
 }
 
 .nav-bar {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    
-    /* Устанавливаем высоту, которая обеспечит "воздух" вокруг иконок */
-    /* 100px - 120px обычно идеально, чтобы иконки не жались к верху */
-    height: 100px; 
-    
+    /* Уменьшили высоту со 120px до 85px, чтобы оно стало "ниже" */
+    height: 85px; 
     background: #ffffff;
-    width: 100%;
 }
 
 .nav-item {
@@ -534,14 +505,5 @@ html, body {
     justify-content: center;
     align-items: center;
     flex: 1;
-    /* Убеждаемся, что внутри элемента нет лишних padding/margin */
-    padding: 0;
-    margin: 0;
-}
-
-.nav-item img {
-    display: block;
-    /* Твои иконки по 40px шириной */
-    width: 40px;
-    height: auto;
+    height: 100%;
 }
