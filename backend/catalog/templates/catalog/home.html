@@ -54,14 +54,12 @@
             <!-- <div id="search-sensor" style="height: 1px; width: 100%;"></div> -->
 
             <div class="sticky-search-container">
-                <div class="search-section">
-                    <div class="search-bar">
-                        <input type="text" placeholder="ПОИСК">
-                        <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
-                            <circle cx="14" cy="14" r="10" stroke="black" stroke-width="1.2"/>
-                            <path d="M27 27L21 21" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
-                        </svg>
-                    </div>
+                <div class="search-bar">
+                    <input type="text" placeholder="ПОИСК">
+                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
+                        <circle cx="14" cy="14" r="10" stroke-width="1.2"/>
+                        <path d="M27 27L21 21" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
                 </div>
             </div>
 
@@ -290,25 +288,21 @@
         const scrollableContent = document.querySelector('.scrollable-content');
         const searchContainer = document.querySelector('.sticky-search-container');
 
-        // Рассчитываем, на каком расстоянии от верха находится поиск
-        // Обычно это высота баннера + высота сториз
-        const getSearchOffset = () => searchContainer.offsetTop;
-
         scrollableContent.addEventListener('scroll', () => {
-            const scrollTop = scrollableContent.scrollTop;
-            const searchOffset = getSearchOffset();
-
-            // Если мы докрутили до поиска (или чуть раньше для плавности)
-            if (scrollTop >= searchOffset - 10) { 
-                if (!header.classList.contains('header-hidden')) {
-                    header.classList.add('header-hidden');
-                }
+            // Получаем позицию контейнера поиска относительно верха
+            const searchRect = searchContainer.getBoundingClientRect();
+            
+            // Порог срабатывания: когда поиск подошел к верхней границе
+            // Мы добавляем небольшой запас в 2 пикселя для плавности на мобильных
+            if (searchRect.top <= 1) {
+                header.classList.add('header-hidden');
+                // Устанавливаем фон чуть более плотным при фиксации, если нужно
+                searchContainer.style.background = "rgba(242, 242, 242, 0.85)";
             } else {
-                if (header.classList.contains('header-hidden')) {
-                    header.classList.remove('header-hidden');
-                }
+                header.classList.remove('header-hidden');
+                searchContainer.style.background = "rgba(242, 242, 242, 0.7)";
             }
-        }, { passive: true }); // passive: true повышает производительность скролла
+        }, { passive: true });
     });
     const tg = window.Telegram.WebApp;
     tg.ready();

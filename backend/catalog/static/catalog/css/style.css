@@ -695,16 +695,6 @@ html, body {
     transform: translateY(-20px); /* Небольшое смещение вверх для красоты */
 }
 
-/* Поиск должен прилипать к самому верху экрана */
-.sticky-search-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    background-color: #F2F2F2;
-    /* Убедимся, что нет лишних отступов сверху */
-    margin-top: 0; 
-}
 
 /* Шапка */
 .custom-header {
@@ -734,41 +724,6 @@ html, body {
     pointer-events: none;
 }
 
-/* Контейнер поиска - строго к верху */
-.sticky-search-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0; /* Прилипает к самому верху экрана */
-    z-index: 1100;
-    background-color: #F2F2F2;
-}
-
-/* Основной контейнер, который прилипает */
-.sticky-search-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1100;
-    
-    /* Эффект стекла */
-    background: rgba(242, 242, 242, 0.8); /* Полупрозрачный фон */
-    backdrop-filter: blur(15px);         /* Размытие заднего плана */
-    -webkit-backdrop-filter: blur(15px);  /* Поддержка iOS */
-    
-    /* Свойства из Figma для Auto Layout */
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4px 16px 8px; /* Как в Figma: padding: 4px 16px 8px */
-    gap: 10px;
-    
-    width: 100%;           /* Адаптивно под 375px */
-    height: 44px;
-    box-sizing: border-box;
-    
-    transition: all 0.3s ease;
-}
 
 /* Стили самой секции поиска (убираем лишние отступы, если были) */
 .search-section {
@@ -814,4 +769,169 @@ html, body {
 /* Убираем рамку у инпута, если она была */
 .search-bar input::placeholder {
     color: rgba(50, 50, 50, 0.5);
+}
+
+/* Шапка теперь будет исчезать полностью, не оставляя места */
+.custom-header {
+    width: 100%;
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    flex-shrink: 0;
+    margin: 0; /* Убираем любые внешние отступы */
+}
+
+/* Эффект прозрачного стекла для поиска */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1200; /* Поднимаем слой выше всех */
+    
+    /* Стили из твоего дизайна Figma */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 8px; 
+    gap: 10px;
+    height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+
+    /* Настройка прозрачности "Стекло" */
+    background: rgba(242, 242, 242, 0.7); /* 70% непрозрачности фона */
+    backdrop-filter: blur(20px) saturate(180%); /* Размытие заднего фона */
+    -webkit-backdrop-filter: blur(20px) saturate(180%); /* Для iOS Safari */
+    
+    border-bottom: 0.5px solid rgba(50, 50, 50, 0.1); /* Тонкая линия разделения */
+}
+
+/* Исправляем стили инпута внутри контейнера */
+.search-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent; /* Убираем фон у внутренней части */
+}
+
+.search-bar input {
+    font-family: 'SF Pro', sans-serif;
+    font-weight: 274;
+    font-size: 32px;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.5);
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+}
+
+/* --- ОБНОВЛЕННАЯ ШАПКА --- */
+.custom-header {
+    width: 100%;
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    z-index: 1000;
+    flex-shrink: 0;
+    
+    /* Плавное исчезновение */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
+    will-change: height, opacity;
+}
+
+/* Класс скрытия шапки (JS добавит его при скролле) */
+.header-hidden {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    opacity: 0 !important;
+    pointer-events: none;
+}
+
+/* --- ОБНОВЛЕННЫЙ КОНТЕЙНЕР ПОИСКА (ЭФФЕКТ СТЕКЛА) --- */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: env(safe-area-inset-top);
+    z-index: 1200;
+    
+    /* Стили из Figma */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 8px; 
+    gap: 10px;
+    height: 44px;
+    width: 100%;
+    box-sizing: border-box;
+
+    /* Эффект прозрачности и размытия */
+    background: rgba(242, 242, 242, 0.7); /* Прозрачный фон */
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    
+    /* Тонкая линия разделения снизу */
+    border-bottom: 0.5px solid rgba(50, 50, 50, 0.1);
+    transition: background 0.3s ease;
+}
+
+/* Стили самого поля ввода */
+.search-section {
+    width: 100%;
+}
+
+.search-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    background: transparent;
+}
+
+.search-bar input {
+    /* Точные параметры шрифта из твоего запроса Figma */
+    font-family: 'SF Pro', -apple-system, sans-serif;
+    font-weight: 274;
+    font-size: 32px;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.5); /* 50% прозрачность текста */
+    
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+    padding: 0;
+    text-transform: uppercase;
+}
+
+/* Плейсхолдер такого же цвета */
+.search-bar input::placeholder {
+    color: rgba(50, 50, 50, 0.5);
+}
+
+/* Иконка лупы из Figma */
+.search-icon-svg {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+}
+.search-icon-svg circle, 
+.search-icon-svg path {
+    stroke: rgba(50, 50, 50, 0.5); /* Цвет иконки как у текста */
 }
