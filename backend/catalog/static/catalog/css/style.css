@@ -936,47 +936,40 @@ html, body {
     stroke: rgba(50, 50, 50, 0.5); /* Цвет иконки как у текста */
 }
 
-.sticky-search-container {
-    position: -webkit-sticky;
-    position: sticky;
-    top: 0;
-    z-index: 1200;
-    
-    /* Растягиваем контейнер вверх до самого края экрана (под челку) */
-    margin-top: calc((env(safe-area-inset-top) + 44px) * -1); 
-    padding-top: calc(env(safe-area-inset-top) + 4px);
-    
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding-left: 16px;
-    padding-right: 16px;
-    padding-bottom: 8px;
-    
-    height: auto; /* Высота подстроится под безопасную зону + 44px */
-    width: 100%;
-    box-sizing: border-box;
-
-    /* Эффект Glassmorphism */
-    background: rgba(242, 242, 242, 0.7); 
-    backdrop-filter: blur(20px) saturate(180%);
-    -webkit-backdrop-filter: blur(20px) saturate(180%);
-    
-    border-bottom: none;
-}
-
-/* Убедись, что инпут внутри не имеет своего фона */
+/* Контейнер поиска внутри sticky-блока */
 .search-bar {
-    background: transparent !important;
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between; /* Обычное состояние: по краям */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); /* Плавный переход */
+    position: relative;
 }
 
+/* Когда поиск прилип к верху */
+.sticky-search-container.is-stuck .search-bar {
+    justify-content: center; /* Центрируем содержимое */
+}
+
+/* Настраиваем инпут для центровки текста */
 .search-bar input {
-    background: transparent !important;
-    /* Твой дизайн из Figma */
-    font-family: 'SF Pro', sans-serif;
-    font-weight: 274;
-    font-size: 32px;
-    color: rgba(50, 50, 50, 0.5);
+    transition: all 0.4s ease;
+    text-align: left; /* В обычном состоянии слева */
 }
 
+.sticky-search-container.is-stuck .search-bar input {
+    text-align: center; /* При скролле текст по центру */
+    padding-left: 26px; /* Компенсируем ширину иконки лупы справа, чтобы слово было идеально по центру */
+}
+
+/* Иконка лупы */
+.search-icon-svg {
+    transition: all 0.4s ease;
+}
+
+/* Если хочешь, чтобы при центровке лупа оставалась справа или тоже смещалась, 
+   можно добавить абсолютное позиционирование при фиксации */
+.sticky-search-container.is-stuck .search-icon-svg {
+    position: absolute;
+    right: 0;
+}

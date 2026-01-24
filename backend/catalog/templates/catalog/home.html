@@ -320,6 +320,22 @@
             }, { passive: true });
         }
 
+        scrollableContent.addEventListener('scroll', () => {
+            // Получаем расстояние от поиска до верха экрана
+            const searchRect = searchContainer.getBoundingClientRect();
+            
+            // searchRect.top <= 0 означает, что элемент коснулся верха или ушел выше
+            // Мы берем 10px для более плавного срабатывания на мобильных
+            if (searchRect.top <= 10) {
+                header.classList.add('header-hidden');
+                searchContainer.classList.add('is-stuck');
+            } else {
+                // Пока поиск не доехал до верха, возвращаем всё как было
+                header.classList.remove('header-hidden');
+                searchContainer.classList.remove('is-stuck');
+            }
+        }, { passive: true });
+
         // 4. Свайп картинок товаров
         document.querySelectorAll('.product-image-container').forEach(container => {
             const images = Array.from(container.querySelectorAll('.product-img'));
