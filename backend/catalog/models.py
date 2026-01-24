@@ -127,3 +127,31 @@ class Saved(models.Model):
 
     def __str__(self):
         return f"{self.user} saved {self.product.name}"
+
+
+from django.db import models
+
+
+class HeroBlock(models.Model):
+    image = models.ImageField(
+        upload_to='hero/',
+        verbose_name='Изображение'
+    )
+    title = models.CharField(
+        max_length=255,
+        verbose_name='Большой текст'
+    )
+    subtitle = models.TextField(
+        verbose_name='Малый текст'
+    )
+    is_active = models.BooleanField(
+        default=True,
+        verbose_name='Активный'
+    )
+
+    class Meta:
+        verbose_name = 'Титульник'
+        verbose_name_plural = 'Титульники'
+
+    def __str__(self):
+        return self.title
