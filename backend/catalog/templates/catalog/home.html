@@ -270,10 +270,10 @@
                 <div class="nav-item"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></div>
                 <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
                 <div class="nav-item logo-box">
-                    <a href="{% url 'home' %}">
-                        <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
-                    </a>
-                </div>
+                        <a href="{% url 'home' %}">
+                            <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+                        </a>
+                    </div>
 
                 <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
                 <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
@@ -282,42 +282,45 @@
     </div>
 
     <script>
-document.addEventListener('DOMContentLoaded', () => {
+    tg.disableVerticalSwipes();
+    tg.setHeaderColor('#F2F2F2');
+    tg.setBackgroundColor('#F2F2F2');
+    document.addEventListener('DOMContentLoaded', () => {
 
-    document.querySelectorAll('.product-image-container').forEach(container => {
-        const images = Array.from(container.querySelectorAll('.product-img'));
-        const dots = Array.from(container.querySelectorAll('.dot'));
+        document.querySelectorAll('.product-image-container').forEach(container => {
+            const images = Array.from(container.querySelectorAll('.product-img'));
+            const dots = Array.from(container.querySelectorAll('.dot'));
 
-        if (images.length <= 1) return;
+            if (images.length <= 1) return;
 
-        let index = 0;
-        let startX = 0;
+            let index = 0;
+            let startX = 0;
 
-        container.addEventListener('touchstart', e => {
-            startX = e.touches[0].clientX;
+            container.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+            });
+
+            container.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) < 40) return;
+
+                images[index].classList.remove('active');
+                dots[index]?.classList.remove('active');
+
+                if (diff > 0) {
+                    index = (index + 1) % images.length;
+                } else {
+                    index = (index - 1 + images.length) % images.length;
+                }
+
+                images[index].classList.add('active');
+                dots[index]?.classList.add('active');
+            });
         });
 
-        container.addEventListener('touchend', e => {
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-
-            if (Math.abs(diff) < 40) return;
-
-            images[index].classList.remove('active');
-            dots[index]?.classList.remove('active');
-
-            if (diff > 0) {
-                index = (index + 1) % images.length;
-            } else {
-                index = (index - 1 + images.length) % images.length;
-            }
-
-            images[index].classList.add('active');
-            dots[index]?.classList.add('active');
-        });
     });
-
-});
 </script>
 
 </body>
