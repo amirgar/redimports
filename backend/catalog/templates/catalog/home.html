@@ -53,7 +53,7 @@
             <br>
             <br>
             <br>
-            
+
             <!-- <div id="search-sensor" style="height: 1px; width: 100%;"></div> -->
 
             <div class="sticky-search-container">
@@ -287,32 +287,39 @@
 
     <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // 1. Инициализация Telegram
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.disableVerticalSwipes();
+        tg.setHeaderColor('#F2F2F2');
+        tg.setBackgroundColor('#F2F2F2');
+
+        // 2. Элементы интерфейса
         const header = document.querySelector('.custom-header');
         const scrollableContent = document.querySelector('.scrollable-content');
         const searchContainer = document.querySelector('.sticky-search-container');
 
-        scrollable-content.addEventListener('scroll', () => {
-        const scrollTop = scrollableContent.scrollTop;
-        
-        // Если проскроллили больше высоты шапки
-        if (scrollTop > 50) {
-            header.classList.add('header-hidden');
-            // Делаем фон поиска чуть плотнее при фиксации
-            searchContainer.style.background = "rgba(242, 242, 242, 0.85)";
-        } else {
-            header.classList.remove('header-hidden');
-            // В самом верху делаем его максимально прозрачным
-            searchContainer.style.background = "rgba(242, 242, 242, 0.6)";
+        // 3. Обработка скролла (Поиск и Шапка)
+        if (scrollableContent && searchContainer && header) {
+            scrollableContent.addEventListener('scroll', () => {
+                const scrollTop = scrollableContent.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('header-hidden');
+                    searchContainer.classList.add('is-stuck');
+                    // Устанавливаем фон через JS как запасной вариант, 
+                    // но лучше оставить это в CSS классе .is-stuck
+                    searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
+                } else {
+                    header.classList.remove('header-hidden');
+                    searchContainer.classList.remove('is-stuck');
+                    searchContainer.style.backgroundColor = "transparent";
+                }
+            }, { passive: true });
         }
-    }, { passive: true });
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    tg.expand();
-    tg.disableVerticalSwipes();
-    tg.setHeaderColor('#F2F2F2');
-    tg.setBackgroundColor('#F2F2F2');
-    document.addEventListener('DOMContentLoaded', () => {
 
+        // 4. Свайп картинок товаров
         document.querySelectorAll('.product-image-container').forEach(container => {
             const images = Array.from(container.querySelectorAll('.product-img'));
             const dots = Array.from(container.querySelectorAll('.dot'));
@@ -324,7 +331,7 @@
 
             container.addEventListener('touchstart', e => {
                 startX = e.touches[0].clientX;
-            });
+            }, { passive: true });
 
             container.addEventListener('touchend', e => {
                 const endX = e.changedTouches[0].clientX;
@@ -345,9 +352,8 @@
                 dots[index]?.classList.add('active');
             });
         });
-
     });
-</script>
+    </script>
 
 </body>
 </html>
