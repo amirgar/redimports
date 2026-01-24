@@ -935,3 +935,47 @@ html, body {
 .search-icon-svg path {
     stroke: rgba(50, 50, 50, 0.5); /* Цвет иконки как у текста */
 }
+
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    
+    /* Растягиваем контейнер вверх до самого края экрана (под челку) */
+    margin-top: calc((env(safe-area-inset-top) + 44px) * -1); 
+    padding-top: calc(env(safe-area-inset-top) + 4px);
+    
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 16px;
+    padding-right: 16px;
+    padding-bottom: 8px;
+    
+    height: auto; /* Высота подстроится под безопасную зону + 44px */
+    width: 100%;
+    box-sizing: border-box;
+
+    /* Эффект Glassmorphism */
+    background: rgba(242, 242, 242, 0.7); 
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    
+    border-bottom: 0.5px solid rgba(50, 50, 50, 0.1);
+}
+
+/* Убедись, что инпут внутри не имеет своего фона */
+.search-bar {
+    background: transparent !important;
+}
+
+.search-bar input {
+    background: transparent !important;
+    /* Твой дизайн из Figma */
+    font-family: 'SF Pro', sans-serif;
+    font-weight: 274;
+    font-size: 32px;
+    color: rgba(50, 50, 50, 0.5);
+}
