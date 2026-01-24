@@ -18,18 +18,19 @@
                 </div>
             </header>
             <section class="hero-banner">
+                {% if hero %}
                 <div class="hero-bg-container">
-                    <img src="{% static 'catalog/img/hero.jpg' %}" class="hero-bg-img">
+                    <img src="{{ hero.image.url }}" class="hero-bg-img">
                 </div>
                 <div class="hero-content">
                     <div class="hero-text">
-                        <h1>winter<br>2026</h1>
+                        <h1>{{ hero.title|linebreaksbr }}</h1>
                         <p class="promo-text">
-                            <span class="discount">-50%</span> на всю обувь<br>
-                            с декабря по январь
+                            {{ hero.subtitle|linebreaksbr }}
                         </p>
                     </div>
                 </div>
+                {% endif %}
             </section>
 
             <div class="stories-container">

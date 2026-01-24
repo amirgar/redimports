@@ -137,7 +137,7 @@ class HeroBlock(models.Model):
         upload_to='hero/',
         verbose_name='Изображение'
     )
-    title = models.CharField(
+    title = models.TextField(
         max_length=255,
         verbose_name='Большой текст'
     )

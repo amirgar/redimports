@@ -239,7 +239,7 @@ class OrderCreateView(APIView):
         return Response(serializer.data, status=201)
 
 from django.views.generic import TemplateView
-
+from .models import HeroBlock
 from .models import Category
 
 def home(request):
@@ -253,6 +253,7 @@ def home(request):
     all_products = Product.objects.prefetch_related('images').all()
     all_products_counter = Product.objects.count()
     recommended_products = Product.objects.all().prefetch_related('images')[:4]
+    hero = HeroBlock.objects.filter(is_active=True).first()
 
     return render(request, 'catalog/home.html', {
         'categories': categories,
@@ -264,4 +265,5 @@ def home(request):
         'recommended_products': recommended_products,
         'all_products': all_products,
         'all_products_counter': all_products_counter,
+        'hero': hero,
     })
