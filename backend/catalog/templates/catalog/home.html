@@ -10,14 +10,13 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="custom-header">
-            <div class="header-content">
-                <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
-                <span class="header-logo-text">red imports</span>
-            </div>
-        </header>
-
         <main class="scrollable-content">
+            <header class="custom-header">
+                <div class="header-content">
+                    <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
+                    <span class="header-logo-text">red imports</span>
+                </div>
+            </header>
             <section class="hero-banner">
                 <div class="hero-bg-container">
                     <img src="{% static 'catalog/img/hero.jpg' %}" class="hero-bg-img">
@@ -51,14 +50,18 @@
                     <span>Идеи подарка</span>
                 </div>
             </div>
+            
+            <!-- <div id="search-sensor" style="height: 1px; width: 100%;"></div> -->
 
-            <div class="search-section">
-                <div class="search-bar">
-                    <input type="text" placeholder="Поиск">
-                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
-                        <circle cx="14" cy="14" r="10" stroke="black" stroke-width="1.2"/>
-                        <path d="M27 27L21 21" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
-                    </svg>
+            <div class="sticky-search-container">
+                <div class="search-section">
+                    <div class="search-bar">
+                        <input type="text" placeholder="ПОИСК">
+                        <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
+                            <circle cx="14" cy="14" r="10" stroke="black" stroke-width="1.2"/>
+                            <path d="M27 27L21 21" stroke="black" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
 
@@ -282,6 +285,31 @@
     </div>
 
     <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.querySelector('.custom-header');
+        const scrollableContent = document.querySelector('.scrollable-content');
+        const searchContainer = document.querySelector('.sticky-search-container');
+
+        // Рассчитываем, на каком расстоянии от верха находится поиск
+        // Обычно это высота баннера + высота сториз
+        const getSearchOffset = () => searchContainer.offsetTop;
+
+        scrollableContent.addEventListener('scroll', () => {
+            const scrollTop = scrollableContent.scrollTop;
+            const searchOffset = getSearchOffset();
+
+            // Если мы докрутили до поиска (или чуть раньше для плавности)
+            if (scrollTop >= searchOffset - 10) { 
+                if (!header.classList.contains('header-hidden')) {
+                    header.classList.add('header-hidden');
+                }
+            } else {
+                if (header.classList.contains('header-hidden')) {
+                    header.classList.remove('header-hidden');
+                }
+            }
+        }, { passive: true }); // passive: true повышает производительность скролла
+    });
     const tg = window.Telegram.WebApp;
     tg.ready();
     tg.expand();

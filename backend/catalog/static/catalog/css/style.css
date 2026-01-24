@@ -588,3 +588,230 @@ html, body {
     opacity: 1;
     pointer-events: auto;
 }
+
+
+/* Обертка для фиксации */
+.sticky-search-wrapper {
+    position: -webkit-sticky; /* Для поддержки iOS/Safari */
+    position: sticky;
+    top: 0;                   /* Прилипает к самому верху */
+    z-index: 1100;            /* Выше основного контента, но ниже системной шапки если надо */
+    background-color: #F2F2F2; /* Цвет фона должен совпадать с фоном приложения, чтобы перекрывать контент под ним */
+    padding-top: 5px;         /* Небольшой отступ сверху */
+}
+
+/* Обновляем стили секции поиска */
+.search-section {
+    padding: 10px 16px 20px 16px; /* Настраиваем отступы как в макете */
+    margin-bottom: 0;             /* Убираем нижний отступ здесь, так как он мешает sticky */
+}
+
+/* Стили самого инпута (из твоего макета) */
+.search-bar { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(50, 50, 50, 0.1); /* Тонкая линия как в Figma */
+    padding-bottom: 10px;
+    background-color: #F2F2F2;
+}
+
+.search-bar input {
+    font-family: 'TT Firs Neue', sans-serif; 
+    font-size: 40px; /* Размер шрифта ПОИСК */
+    border: none;
+    outline: none; 
+    background: transparent; 
+    width: 100%; 
+    letter-spacing: -1px;
+    text-transform: uppercase; /* Чтобы всегда капсом как на фото */
+    color: #323232;
+}
+
+.search-bar input::placeholder {
+    color: #323232; /* Цвет плейсхолдера как основного текста */
+    opacity: 0.3;   /* Легкая прозрачность */
+}
+
+.search-icon-svg { 
+    width: 28px; 
+    height: 28px; 
+    opacity: 0.4;
+}
+
+/* Добавь переход для плавного скрытия шапки */
+.custom-header {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform, opacity;
+}
+
+/* Класс, который мы будем добавлять через JS */
+.header-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none; /* Чтобы нельзя было кликнуть на невидимую шапку */
+}
+
+/* Скрытый блок-маяк над поиском */
+#search-sensor {
+    height: 1px;
+    width: 100%;
+    margin-top: -1px;
+}
+
+/* Поиск должен прилипать к самому верху (0px) */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    background-color: #F2F2F2;
+}
+
+/* Обновляем стили шапки */
+.custom-header {
+    width: 100%;
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Фиксируем высоту для анимации */
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    z-index: 1000;
+    flex-shrink: 0;
+    
+    /* Добавляем плавность для всех свойств */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden; /* Чтобы контент не вылезал при схлопывании */
+}
+
+/* Класс, который убирает высоту и пространство */
+.header-hidden {
+    height: 0 !important;
+    padding-top: 0 !important;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-20px); /* Небольшое смещение вверх для красоты */
+}
+
+/* Поиск должен прилипать к самому верху экрана */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    background-color: #F2F2F2;
+    /* Убедимся, что нет лишних отступов сверху */
+    margin-top: 0; 
+}
+
+/* Шапка */
+.custom-header {
+    width: 100%;
+    background-color: #F2F2F2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    z-index: 1000;
+    flex-shrink: 0;
+    
+    /* Плавность и оптимизация */
+    transition: all 0.2s ease-out;
+    overflow: hidden;
+    will-change: height, opacity, transform;
+}
+
+/* Класс скрытия */
+.header-hidden {
+    height: 0 !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    opacity: 0 !important;
+    transform: translateY(-10px);
+    pointer-events: none;
+}
+
+/* Контейнер поиска - строго к верху */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0; /* Прилипает к самому верху экрана */
+    z-index: 1100;
+    background-color: #F2F2F2;
+}
+
+/* Основной контейнер, который прилипает */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1100;
+    
+    /* Эффект стекла */
+    background: rgba(242, 242, 242, 0.8); /* Полупрозрачный фон */
+    backdrop-filter: blur(15px);         /* Размытие заднего плана */
+    -webkit-backdrop-filter: blur(15px);  /* Поддержка iOS */
+    
+    /* Свойства из Figma для Auto Layout */
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 16px 8px; /* Как в Figma: padding: 4px 16px 8px */
+    gap: 10px;
+    
+    width: 100%;           /* Адаптивно под 375px */
+    height: 44px;
+    box-sizing: border-box;
+    
+    transition: all 0.3s ease;
+}
+
+/* Стили самой секции поиска (убираем лишние отступы, если были) */
+.search-section {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Текст "ПОИСК" */
+.search-bar input {
+    /* Стили из Figma */
+    font-family: 'SF Pro', sans-serif;
+    font-style: normal;
+    font-weight: 274;
+    font-size: 32px;
+    line-height: 32px;
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.5); /* Темный 50% */
+    
+    border: none;
+    outline: none;
+    background: transparent;
+    width: 100%;
+}
+
+/* Иконка лупы */
+.search-icon-svg {
+    width: 26px;  /* Из Figma */
+    height: 26px; /* Из Figma */
+    flex: none;
+    order: 1;
+    opacity: 0.5; /* Соответствует 50% прозрачности из Figma */
+}
+
+/* Убираем рамку у инпута, если она была */
+.search-bar input::placeholder {
+    color: rgba(50, 50, 50, 0.5);
+}
