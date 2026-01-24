@@ -991,22 +991,43 @@ html, body {
 }
 
 /* Когда прилип (активируется только при searchRect.top <= 10) */
+/* Когда поиск прилип к верху */
 .sticky-search-container.is-stuck {
-    background: rgba(242, 242, 242, 0.7) !important;
+    /* Растягиваем фон вверх под системные индикаторы */
+    padding-top: env(safe-area-inset-top);
+    margin-top: calc(env(safe-area-inset-top) * -1);
+    
+    /* Увеличиваем высоту: 44px (стандарт) + 20px (запас вниз) + зона челки */
+    height: calc(64px + env(safe-area-inset-top)); 
+    
+    background: rgba(242, 242, 242, 0.72) !important;
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     
-    /* Добавляем отступ под челку только при фиксации */
-    padding-top: env(safe-area-inset-top);
-    margin-top: calc(env(safe-area-inset-top) * -1);
+    display: flex;
+    align-items: flex-end; /* Текст будет "лежать" ближе к нижнему краю блока */
+    padding-bottom: 12px;  /* Отступ от текста до нижнего края размытия */
+    border-bottom: none;
 }
 
-/* Центрирование текста */
+/* Центрирование внутренней части */
 .sticky-search-container.is-stuck .search-bar {
     justify-content: center;
+    width: 100%;
+    position: relative;
+    height: 32px; /* Фиксируем высоту строки поиска */
 }
 
+/* Иконка лупы при центровке */
+.sticky-search-container.is-stuck .search-icon-svg {
+    position: absolute;
+    right: 16px; /* Оставляем её справа, чтобы не мешала тексту в центре */
+    bottom: 4px;
+}
+
+/* Сам текст ПОИСК */
 .sticky-search-container.is-stuck .search-bar input {
     text-align: center;
-    padding-left: 26px; /* центровка с учетом иконки */
+    padding-left: 0; 
+    font-size: 28px; /* Можно чуть уменьшить, чтобы выглядело аккуратнее при фиксации */
 }
