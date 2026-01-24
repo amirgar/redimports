@@ -149,19 +149,114 @@
                 </div>
             </div>
             
+            
 
             </div>
     </div>
-        </main>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
 
+        <div class="brands-section">
+        <div class="brands-header">
+            <h2 class="categories-title">бренды</h2>
+            <div class="brands-count">
+                <span>23</span>
+                <svg class="arrow-icon" viewBox="0 0 12 12" fill="none">
+                    <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="brands-scroll">
+            <div class="brand-item">
+                <div class="brand-card">
+                    <img src="{% static 'catalog/img/nike_logo.svg' %}" alt="nike">
+                </div>
+                <span class="brand-label">nike</span>
+            </div>
+
+            <div class="brand-item">
+                <div class="brand-card">
+                    <img src="{% static 'catalog/img/adidas_logo.svg' %}" alt="adidas">
+                </div>
+                <span class="brand-label">adidas</span>
+            </div>
+
+            <div class="brand-item">
+                <div class="brand-card">
+                    <img src="{% static 'catalog/img/nb_logo.svg' %}" alt="new balance">
+                </div>
+                <span class="brand-label">new balance</span>
+            </div>
+
+            <div class="brand-item">
+                <div class="brand-card">
+                    <img src="{% static 'catalog/img/puma_logo.svg' %}" alt="puma">
+                </div>
+                <span class="brand-label">puma</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="products-section">
+    <div class="products-header">
+        <h2 class="categories-title">ДЛЯ ВАС</h2>
+        <div class="products-count">
+            <span>48</span>
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <div class="products-grid">
+        <div class="product-card">
+            <div class="product-image-container">
+                <button class="wishlist-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+                <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
+                <div class="pagination-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="price-row">
+                    <span class="current-price">12 400 ₽</span>
+                </div>
+                <h3 class="brand-name">Jordan</h3>
+                <p class="product-description">Retro High OG</p>
+            </div>
+        </div>
+
+        <div class="product-card">
+            <div class="product-image-container">
+                <button class="wishlist-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                </button>
+                <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
+                <div class="pagination-dots">
+                    <span class="dot active"></span>
+                    <span class="dot"></span>
+                </div>
+            </div>
+            <div class="product-info">
+                <div class="price-row">
+                    <span class="current-price">9 200 ₽</span>
+                </div>
+                <h3 class="brand-name">New Balance</h3>
+                <p class="product-description">530 White Silver</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-spacer"></div>
+        </main>
         <footer class="bottom-fixed-container">
             <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
             <nav class="nav-bar">
