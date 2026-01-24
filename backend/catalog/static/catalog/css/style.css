@@ -343,6 +343,7 @@ html, body {
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
+    /* z-index: ; */
 }
 
 /* Инфо о товаре */

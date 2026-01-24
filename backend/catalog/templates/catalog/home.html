@@ -90,7 +90,7 @@
         <div class="products-header">
             <h2 class="products-title">НОВИНКИ</h2>
             <div class="products-count">
-                <span>256</span>
+                <span>{{ new_products_counter }}</span>
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                     <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -104,10 +104,10 @@
                     <div class="product-image-container"
                         data-product-id="{{ product.id }}">
 
-                        {# 1️⃣ NEW #}
+                        <!-- {# 1️⃣ NEW #}
                         {% if product.is_new %}
                             <span class="badge-new">NEW</span>
-                        {% endif %}
+                        {% endif %} -->
 
                         <button class="wishlist-btn">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -118,6 +118,9 @@
                         {# КАРТИНКИ #}
                         <div class="product-image-container">
                             {% for image in product.images.all %}
+                                {% if product.is_new %}
+                                    <span class="badge-new">NEW</span>
+                                {% endif %}
                                 <img
                                     src="{{ image.image.url }}"
                                     class="product-img{% if forloop.first %} active{% endif %}"
@@ -187,7 +190,7 @@
     <div class="products-header">
         <h2 class="categories-title">ДЛЯ ВАС</h2>
         <div class="products-count">
-            <span>48</span>
+            <span>{{ all_products_counter }}</span>
             <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
                 <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -195,52 +198,69 @@
     </div>
 
     <div class="products-grid">
-        <div class="product-card">
-            <div class="product-image-container">
-                <button class="wishlist-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                </button>
-                <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
-                <div class="pagination-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                </div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="current-price">12 400 ₽</span>
-                </div>
-                <h3 class="brand-name">Jordan</h3>
-                <p class="product-description">Retro High OG</p>
-            </div>
-        </div>
+            {% for product in all_products %}
+                <div class="product-card">
 
-        <div class="product-card">
-            <div class="product-image-container">
-                <button class="wishlist-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                    </svg>
-                </button>
-                <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
-                <div class="pagination-dots">
-                    <span class="dot active"></span>
-                    <span class="dot"></span>
+                    <div class="product-image-container"
+                        data-product-id="{{ product.id }}">
+
+                        {# 1️⃣ NEW #}
+                        <!-- {% if product.is_new %}
+                            <span class="badge-new">NEW</span>
+                        {% endif %} -->
+
+                        <button class="wishlist-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+
+                        {# КАРТИНКИ #}
+                        <div class="product-image-container">
+                            {% for image in product.images.all %}
+                                {% if product.is_new %}
+                                    <span class="badge-new">NEW</span>
+                                {% endif %}
+                                <img
+                                    src="{{ image.image.url }}"
+                                    class="product-img{% if forloop.first %} active{% endif %}"
+                                    draggable="false"
+                                >
+                            {% endfor %}
+
+                            {% if product.images.count > 1 %}
+                            <div class="pagination-dots">
+                                {% for image in product.images.all %}
+                                    <span class="dot{% if forloop.first %} active{% endif %}"></span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="product-info">
+
+                        {# 2️⃣ ЦЕНА #}
+                        <div class="price-row">
+                            <div class="price-row">
+                                {% if product.discount_price %}
+                                    <span class="old-price">{{ product.discount_price }} ₽</span>
+                                    <span class="current-price">{{ product.price }} ₽</span>
+                                {% else %}
+                                    <span class="current-price black">{{ product.price }} ₽</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <h3 class="brand-name">{{ product.brand.name }}</h3>
+                        <p class="product-description">{{ product.name }}</p>
+                    </div>
+
                 </div>
-            </div>
-            <div class="product-info">
-                <div class="price-row">
-                    <span class="current-price">9 200 ₽</span>
-                </div>
-                <h3 class="brand-name">New Balance</h3>
-                <p class="product-description">530 White Silver</p>
-            </div>
+            {% endfor %}
+
         </div>
-    </div>
-</div>
 
 <div class="bottom-spacer"></div>
         </main>
@@ -249,7 +269,12 @@
             <nav class="nav-bar">
                 <div class="nav-item"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></div>
                 <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
-                <div class="nav-item logo-box"><img src="{% static 'catalog/img/logo_red.svg' %}" width="28"></div>
+                <div class="nav-item logo-box">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+                    </a>
+                </div>
+
                 <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
                 <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
             </nav>

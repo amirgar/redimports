@@ -249,6 +249,9 @@ def home(request):
     brands = Brand.objects.all()
     brands_count = Brand.objects.count()  # опционально
     new_products = Product.objects.filter(is_new=True).prefetch_related('images').all()
+    new_products_counter = Product.objects.filter(is_new=True).count()
+    all_products = Product.objects.prefetch_related('images').all()
+    all_products_counter = Product.objects.count()
     recommended_products = Product.objects.all().prefetch_related('images')[:4]
 
     return render(request, 'catalog/home.html', {
@@ -257,5 +260,8 @@ def home(request):
         'brands': brands,
         'brands_count': brands_count,  # если понадобится
         'new_products': new_products,
+        'new_products_counter': new_products_counter,
         'recommended_products': recommended_products,
+        'all_products': all_products,
+        'all_products_counter': all_products_counter,
     })
