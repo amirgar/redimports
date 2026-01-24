@@ -140,24 +140,15 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
 import os
+# settings.py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.environ.get('SQLITE_PATH', '/data/db.sqlite3'),
+    }
+}
 
-if os.environ.get('AMVERA', False):
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': '/data/db.sqlite3',
-        }
-    }
-    MEDIA_ROOT = '/data/media'
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-    MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/data/media')
 
 AUTH_USER_MODEL = 'telegram_auth.User'
