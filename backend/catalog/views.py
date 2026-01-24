@@ -267,3 +267,6 @@ def home(request):
         'all_products_counter': all_products_counter,
         'hero': hero,
     })
+
+def catalog(request): 
+    return render(request, 'catalog/catalog.html')

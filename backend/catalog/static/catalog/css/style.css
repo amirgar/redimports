@@ -1031,3 +1031,149 @@ html, body {
     padding-left: 0; 
     font-size: 28px; /* Можно чуть уменьшить, чтобы выглядело аккуратнее при фиксации */
 }
+
+/* Заголовок КАТАЛОГ */
+.catalog-section {
+    padding: 0 16px;
+}
+
+.catalog-title {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 36px;
+    font-weight: 274; /* Тонкое начертание как в Figma */
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.5); /* 50% прозрачность как у поиска */
+    text-transform: lowercase;
+    margin: 10px 0 24px 0;
+}
+
+/* Список категорий */
+.catalog-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.catalog-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    text-decoration: none;
+    border-bottom: 0.5px solid rgba(50, 50, 50, 0.1); /* Тонкая разделительная линия */
+    transition: opacity 0.2s ease;
+}
+
+.catalog-item:active {
+    opacity: 0.5; /* Эффект нажатия в iOS */
+}
+
+.catalog-item span {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 24px;
+    font-weight: 400;
+    text-transform: uppercase;
+    color: #323232;
+    letter-spacing: -0.01em;
+}
+
+/* Выделение РАСПРОДАЖА красным */
+.catalog-item.highlight-red span {
+    color: #FF3B30;
+}
+
+/* Иконка стрелочки */
+.chevron-icon {
+    width: 20px;
+    height: 20px;
+    color: rgba(50, 50, 50, 0.3); /* Тусклая стрелочка */
+}
+
+/* Тонкая настройка sticky-хедера для этой страницы */
+.sticky-search-container {
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.sticky-search-container.is-stuck {
+    background: rgba(242, 242, 242, 0.8) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+}
+
+/* Контейнер для стрелки и заголовка */
+.catalog-header-row {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Расстояние между стрелкой и текстом */
+    padding: 10px;
+    margin-top: 5px;
+}
+
+/* Стили кнопки назад */
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    text-decoration: none;
+    color: rgba(50, 50, 50, 0.5); /* Цвет совпадает с заголовком */
+    transition: opacity 0.2s ease;
+}
+
+.back-button:active {
+    opacity: 0.3;
+}
+
+/* Обновляем стили заголовка, чтобы убрать лишние отступы */
+.catalog-title {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 36px;
+    font-weight: 274;
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.5);
+    text-transform: lowercase;
+    margin: 0; /* Убираем внешние отступы, так как они теперь в контейнере */
+    line-height: 1;
+}
+
+.catalog-header-row {
+    display: flex;
+    align-items: center;
+    /* Устанавливаем тот же padding, что и у пунктов меню */
+    padding: 10px;
+    margin-top: 8px;
+}
+
+.back-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Отрицательный отступ смещает иконку влево, 
+       чтобы текст "каталог" встал вровень с "НОВИНКИ" */
+    margin-left: -8px; 
+    width: 32px;
+    height: 32px;
+    color: rgba(50, 50, 50, 0.4);
+    text-decoration: none;
+}
+
+.catalog-title {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 34px; /* Чуть уменьшил для соответствия iOS */
+    font-weight: 274;
+    letter-spacing: -0.02em;
+    color: rgba(50, 50, 50, 0.4);
+    text-transform: lowercase;
+    margin: 0;
+    line-height: 1.2;
+    /* Убираем лишние зазоры */
+    padding: 0;
+}
+
+/* Пункты меню для сравнения (убедись, что у них такой же padding) */
+.catalog-item {
+    padding-left: 16px;
+    padding-right: 16px;
+    /* ... остальные стили ... */
+}

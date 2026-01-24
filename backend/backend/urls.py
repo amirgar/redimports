@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from catalog.views import home
+from catalog.views import home, catalog
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/catalog/', include('catalog.urls')),        # API для товаров, Cart, Saved, Order
     path('api/auth/telegram/', include('telegram_auth.urls')),  # Telegram авторизация
     path('', home, name='home'),
+    path('catalog/', catalog, name='catalog'),
 ]
 
 if settings.DEBUG:
