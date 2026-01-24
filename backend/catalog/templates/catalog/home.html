@@ -141,8 +141,8 @@
                         {# 2️⃣ ЦЕНА #}
                         <div class="price-row">
                             <div class="price-row">
-                                {% if product.old_price %}
-                                    <span class="old-price">{{ product.old_price }} ₽</span>
+                                {% if product.discount_price %}
+                                    <span class="old-price">{{ product.discount_price }} ₽</span>
                                     <span class="current-price">{{ product.price }} ₽</span>
                                 {% else %}
                                     <span class="current-price black">{{ product.price }} ₽</span>
