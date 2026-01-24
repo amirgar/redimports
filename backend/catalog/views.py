@@ -268,5 +268,8 @@ def home(request):
         'hero': hero,
     })
 
-def catalog(request): 
-    return render(request, 'catalog/catalog.html')
+def catalog(request):
+    categories = Category.objects.all()
+    return render(request, 'catalog/catalog.html', {
+        'categories': categories
+    })
