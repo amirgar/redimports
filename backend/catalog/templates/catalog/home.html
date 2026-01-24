@@ -66,7 +66,7 @@
                 <div class="categories-header">
                     <h2 class="categories-title">категории</h2>
                     <div class="categories-count">
-                        <span>10</span>
+                        <span>{{ categories_count }}</span>
                         <div class="arrow-container">
                             <svg class="arrow-icon" viewBox="0 0 12 12" fill="none">
                                 <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -76,14 +76,12 @@
                 </div>
 
                 <div class="categories-scroll">
+                    {% for category in categories %}
                     <div class="category-card">
-                        <span class="category-name">куртки</span>
-                        <img src="{% static 'catalog/img/jacket.png' %}" class="category-img" alt="куртки">
+                        <span class="category-name">{{ category.name }}</span>
+                        <img src="{{ category.image.url }}" class="category-img" alt="куртки">
                     </div>
-                    <div class="category-card">
-                        <span class="category-name">кроссы</span>
-                        <img src="{% static 'catalog/img/sneakers.png' %}" class="category-img" alt="кроссы">
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -100,65 +98,73 @@
         </div>
 
         <div class="products-grid">
-            <div class="product-card">
-                <div class="product-image-container">
-                    <span class="badge-new">NEW</span>
-                    <button class="wishlist-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                    </button>
-                    <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
-                    <div class="pagination-dots">
-                        <span class="dot active"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">899</span>
-                        <span class="current-price">899 ₽</span>
-                    </div>
-                    <h3 class="brand-name">nike</h3>
-                    <p class="product-description">ботинки резиновые</p>
-                </div>
-            </div>
-            <div class="product-card">
-                <div class="product-image-container">
-                    <span class="badge-new">NEW</span>
-                    <button class="wishlist-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                        </svg>
-                    </button>
-                    <img src="{% static 'catalog/img/boots.png' %}" class="product-img">
-                    <div class="pagination-dots">
-                        <span class="dot active"></span>
-                        <span class="dot"></span>
-                        <span class="dot"></span>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <div class="price-row">
-                        <span class="old-price">899</span>
-                        <span class="current-price">899 ₽</span>
-                    </div>
-                    <h3 class="brand-name">nike</h3>
-                    <p class="product-description">ботинки резиновые</p>
-                </div>
-            </div>
-            
-            
+            {% for product in new_products %}
+                <div class="product-card">
 
-            </div>
+                    <div class="product-image-container"
+                        data-product-id="{{ product.id }}">
+
+                        {# 1️⃣ NEW #}
+                        {% if product.is_new %}
+                            <span class="badge-new">NEW</span>
+                        {% endif %}
+
+                        <button class="wishlist-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+
+                        {# КАРТИНКИ #}
+                        <div class="product-image-container">
+                            {% for image in product.images.all %}
+                                <img
+                                    src="{{ image.image.url }}"
+                                    class="product-img{% if forloop.first %} active{% endif %}"
+                                    draggable="false"
+                                >
+                            {% endfor %}
+
+                            {% if product.images.count > 1 %}
+                            <div class="pagination-dots">
+                                {% for image in product.images.all %}
+                                    <span class="dot{% if forloop.first %} active{% endif %}"></span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="product-info">
+
+                        {# 2️⃣ ЦЕНА #}
+                        <div class="price-row">
+                            <div class="price-row">
+                                {% if product.old_price %}
+                                    <span class="old-price">{{ product.old_price }} ₽</span>
+                                    <span class="current-price">{{ product.price }} ₽</span>
+                                {% else %}
+                                    <span class="current-price black">{{ product.price }} ₽</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <h3 class="brand-name">{{ product.brand.name }}</h3>
+                        <p class="product-description">{{ product.name }}</p>
+                    </div>
+
+                </div>
+            {% endfor %}
+
+        </div>
     </div>
 
         <div class="brands-section">
         <div class="brands-header">
             <h2 class="categories-title">бренды</h2>
             <div class="brands-count">
-                <span>23</span>
+                <span>{{ brands_count }}</span>
                 <svg class="arrow-icon" viewBox="0 0 12 12" fill="none">
                     <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
@@ -166,33 +172,14 @@
         </div>
 
         <div class="brands-scroll">
-            <div class="brand-item">
-                <div class="brand-card">
-                    <img src="{% static 'catalog/img/nike_logo.svg' %}" alt="nike">
+            {% for brand in brands %}
+                <div class="brand-item">
+                    <div class="brand-card">
+                        <img src="{{ brand.logo.url }}" alt="{{ brand.name }}">
+                    </div>
+                    <span class="brand-label">{{ brand.name|lower }}</span>
                 </div>
-                <span class="brand-label">nike</span>
-            </div>
-
-            <div class="brand-item">
-                <div class="brand-card">
-                    <img src="{% static 'catalog/img/adidas_logo.svg' %}" alt="adidas">
-                </div>
-                <span class="brand-label">adidas</span>
-            </div>
-
-            <div class="brand-item">
-                <div class="brand-card">
-                    <img src="{% static 'catalog/img/nb_logo.svg' %}" alt="new balance">
-                </div>
-                <span class="brand-label">new balance</span>
-            </div>
-
-            <div class="brand-item">
-                <div class="brand-card">
-                    <img src="{% static 'catalog/img/puma_logo.svg' %}" alt="puma">
-                </div>
-                <span class="brand-label">puma</span>
-            </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -270,11 +257,43 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        tg.setHeaderColor('#F2F2F2');
-        tg.setBackgroundColor('#F2F2F2');
-    </script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    document.querySelectorAll('.product-image-container').forEach(container => {
+        const images = Array.from(container.querySelectorAll('.product-img'));
+        const dots = Array.from(container.querySelectorAll('.dot'));
+
+        if (images.length <= 1) return;
+
+        let index = 0;
+        let startX = 0;
+
+        container.addEventListener('touchstart', e => {
+            startX = e.touches[0].clientX;
+        });
+
+        container.addEventListener('touchend', e => {
+            const endX = e.changedTouches[0].clientX;
+            const diff = startX - endX;
+
+            if (Math.abs(diff) < 40) return;
+
+            images[index].classList.remove('active');
+            dots[index]?.classList.remove('active');
+
+            if (diff > 0) {
+                index = (index + 1) % images.length;
+            } else {
+                index = (index - 1 + images.length) % images.length;
+            }
+
+            images[index].classList.add('active');
+            dots[index]?.classList.add('active');
+        });
+    });
+
+});
+</script>
+
 </body>
 </html>

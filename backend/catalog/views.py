@@ -2,11 +2,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
+from django.shortcuts import render
 from django.db.models import Q
 
 from .models import (
     Category, ProductType, Product, Brand,
-    Cart, CartItem, Saved
+    Cart, CartItem, Saved,
 )
 from .serializers import (
     CategorySerializer, ProductTypeSerializer,
@@ -239,5 +240,22 @@ class OrderCreateView(APIView):
 
 from django.views.generic import TemplateView
 
-class HomePageView(TemplateView):
-    template_name = "catalog/home.html"
+from .models import Category
+
+def home(request):
+    categories = Category.objects.all()[:2]
+    categories_count = Category.objects.count()
+
+    brands = Brand.objects.all()
+    brands_count = Brand.objects.count()  # опционально
+    new_products = Product.objects.filter(is_new=True).prefetch_related('images').all()
+    recommended_products = Product.objects.all().prefetch_related('images')[:4]
+
+    return render(request, 'catalog/home.html', {
+        'categories': categories,
+        'categories_count': categories_count,
+        'brands': brands,
+        'brands_count': brands_count,  # если понадобится
+        'new_products': new_products,
+        'recommended_products': recommended_products,
+    })

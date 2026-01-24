@@ -26,10 +26,11 @@ class ProductType(models.Model):
 
 class Brand(models.Model):
     name = models.CharField(max_length=255)
-    logo = models.ImageField(upload_to='brands/')
+    logo = models.FileField(upload_to='brands/')
 
     def __str__(self):
         return self.name
+
 
 class Product(models.Model):
     product_type = models.ForeignKey(
@@ -47,7 +48,10 @@ class Product(models.Model):
     parameter_list = models.JSONField()
     price = models.IntegerField()
     discount_price = models.IntegerField(null=True, blank=True)
-
+    is_new = models.BooleanField(
+        default=False,
+        verbose_name='Новинка'
+    )
     def __str__(self):
         return self.name
 
@@ -55,9 +59,11 @@ class ProductPhoto(models.Model):
     product = models.ForeignKey(
         Product,
         on_delete=models.CASCADE,
-        related_name='photos'
+        related_name='images'
     )
     image = models.ImageField(upload_to='products/')
+    def __str__(self):
+        return f'{self.product.name}'
 
 from django.db import models
 from django.conf import settings
