@@ -973,3 +973,40 @@ html, body {
     position: absolute;
     right: 0;
 }
+
+/* Убедись, что у этой секции нет margin, который мешает касанию верха */
+.search-section {
+    padding: 10px 16px; 
+    margin: 0; 
+}
+
+/* Контейнер поиска в обычном состоянии */
+.sticky-search-container {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    background: transparent;
+    transition: background 0.2s ease;
+}
+
+/* Когда прилип (активируется только при searchRect.top <= 10) */
+.sticky-search-container.is-stuck {
+    background: rgba(242, 242, 242, 0.7) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    
+    /* Добавляем отступ под челку только при фиксации */
+    padding-top: env(safe-area-inset-top);
+    margin-top: calc(env(safe-area-inset-top) * -1);
+}
+
+/* Центрирование текста */
+.sticky-search-container.is-stuck .search-bar {
+    justify-content: center;
+}
+
+.sticky-search-container.is-stuck .search-bar input {
+    text-align: center;
+    padding-left: 26px; /* центровка с учетом иконки */
+}
