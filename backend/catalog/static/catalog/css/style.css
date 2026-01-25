@@ -262,6 +262,8 @@ html, body {
 /* Сетка товаров */
 .products-grid {
     display: grid;
+    gap: 12px; /* Расстояние между карточками */
+    padding: 16px; /* Тот самый отступ от краев экрана */
     grid-template-columns: 1fr 1fr; /* Две колонки */
     gap: 16px;
 }
@@ -1117,6 +1119,7 @@ html, body {
     justify-content: center;
     width: 32px;
     height: 32px;
+    padding-bottom: 12px;
     text-decoration: none;
     color: rgba(50, 50, 50, 0.5); /* Цвет совпадает с заголовком */
     transition: opacity 0.2s ease;
@@ -1471,3 +1474,4 @@ button, svg {
     padding: 10px 16px;
     /* У этой панели тоже не должно быть верхней линии, она отделена нижней линией поиска */
 }
+
