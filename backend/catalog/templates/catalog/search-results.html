@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<div class="app-container">
+    <div class="sticky-search-container">
+        <div class="search-header-row">
+            <a href="{% url 'home' %}" class="back-button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path d="M15 18L9 12L15 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </a>
+            <form action="{% url 'search' %}" method="get" class="search-bar">
+                <input
+                    type="text"
+                    name="q"
+                    placeholder="ПОИСК"
+                    value="{{ query|default:'' }}"
+                >
+                <button type="submit" class="search-btn">
+                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
+                        <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.2"/>
+                        <path d="M27 27L21 21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="scrollable-content">
+        <div class="search-meta-panel">
+            <span class="product-count">
+                {% load ru_plural %}
+
+                <span class="product-count">
+                    {{ all_products_counter }} {{ all_products_counter|ru_plural:"товар,товара,товаров" }}
+                </span>
+            </span>
+        </div>
+        <br>
+        <div class="products-grid">
+            {% for product in all_products %}
+                <div class="product-card">
+
+                    <div class="product-image-container"
+                        data-product-id="{{ product.id }}">
+
+                        {# 1️⃣ NEW #}
+                        <!-- {% if product.is_new %}
+                            <span class="badge-new">NEW</span>
+                        {% endif %} -->
+
+                        <button class="wishlist-btn">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                            </svg>
+                        </button>
+
+                        {# КАРТИНКИ #}
+                        <div class="product-image-container">
+                            {% for image in product.images.all %}
+                                {% if product.is_new %}
+                                    <span class="badge-new">NEW</span>
+                                {% endif %}
+                                <img
+                                    src="{{ image.image.url }}"
+                                    class="product-img{% if forloop.first %} active{% endif %}"
+                                    draggable="false"
+                                >
+                            {% endfor %}
+
+                            {% if product.images.count > 1 %}
+                            <div class="pagination-dots">
+                                {% for image in product.images.all %}
+                                    <span class="dot{% if forloop.first %} active{% endif %}"></span>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                    </div>
+
+                    <div class="product-info">
+
+                        {# 2️⃣ ЦЕНА #}
+                        <div class="price-row">
+                            <div class="price-row">
+                                {% if product.discount_price %}
+                                    <span class="old-price">{{ product.discount_price }} ₽</span>
+                                    <span class="current-price">{{ product.price }} ₽</span>
+                                {% else %}
+                                    <span class="current-price black">{{ product.price }} ₽</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <h3 class="brand-name">{{ product.brand.name }}</h3>
+                        <p class="product-description">{{ product.name }}</p>
+                    </div>
+
+                </div>
+            {% endfor %}
+
+        </div>
+        <div class="bottom-spacer"></div>
+    </div>
+    <nav class="nav-bar" style="background-color: white;">
+        <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
+        <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
+        <div class="nav-item logo-box">
+                <a href="{% url 'home' %}">
+                    <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+                </a>
+            </div>
+
+        <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+        <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
+    </nav>
+    </div>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Инициализация Telegram
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.disableVerticalSwipes();
+        tg.setHeaderColor('#F2F2F2');
+        tg.setBackgroundColor('#F2F2F2');
+
+        // 2. Элементы интерфейса
+        const header = document.querySelector('.custom-header');
+        const scrollableContent = document.querySelector('.scrollable-content');
+        const searchContainer = document.querySelector('.sticky-search-container');
+
+        // 3. Обработка скролла (Поиск и Шапка)
+        if (scrollableContent && searchContainer && header) {
+            scrollableContent.addEventListener('scroll', () => {
+                const scrollTop = scrollableContent.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('header-hidden');
+                    searchContainer.classList.add('is-stuck');
+                    // Устанавливаем фон через JS как запасной вариант, 
+                    // но лучше оставить это в CSS классе .is-stuck
+                    searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
+                } else {
+                    header.classList.remove('header-hidden');
+                    searchContainer.classList.remove('is-stuck');
+                    searchContainer.style.backgroundColor = "transparent";
+                }
+            }, { passive: true });
+        }
+
+        scrollableContent.addEventListener('scroll', () => {
+            // Получаем расстояние от поиска до верха экрана
+            const searchRect = searchContainer.getBoundingClientRect();
+            
+            // searchRect.top <= 0 означает, что элемент коснулся верха или ушел выше
+            // Мы берем 10px для более плавного срабатывания на мобильных
+            if (searchRect.top <= 10) {
+                header.classList.add('header-hidden');
+                searchContainer.classList.add('is-stuck');
+            } else {
+                // Пока поиск не доехал до верха, возвращаем всё как было
+                header.classList.remove('header-hidden');
+                searchContainer.classList.remove('is-stuck');
+            }
+        }, { passive: true });
+
+        // 4. Свайп картинок товаров
+        document.querySelectorAll('.product-image-container').forEach(container => {
+            const images = Array.from(container.querySelectorAll('.product-img'));
+            const dots = Array.from(container.querySelectorAll('.dot'));
+
+            if (images.length <= 1) return;
+
+            let index = 0;
+            let startX = 0;
+
+            container.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            container.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) < 40) return;
+
+                images[index].classList.remove('active');
+                dots[index]?.classList.remove('active');
+
+                if (diff > 0) {
+                    index = (index + 1) % images.length;
+                } else {
+                    index = (index - 1 + images.length) % images.length;
+                }
+
+                images[index].classList.add('active');
+                dots[index]?.classList.add('active');
+            });
+        });
+    });
+    </script>
+</body>

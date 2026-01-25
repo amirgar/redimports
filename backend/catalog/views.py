@@ -273,3 +273,20 @@ def catalog(request):
     return render(request, 'catalog/catalog.html', {
         'categories': categories
     })
+
+def search_results(request):
+    query = request.GET.get('q', '').strip()
+
+    products = Product.objects.prefetch_related('images', 'brand')
+
+    if query:
+        products = products.filter(
+            Q(name__icontains=query) |
+            Q(brand__name__icontains=query)
+        )
+
+    return render(request, 'catalog/search-results.html', {
+        'all_products': products,
+        'all_products_counter': products.count(),
+        'query': query,
+    })

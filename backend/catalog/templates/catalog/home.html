@@ -59,13 +59,19 @@
             <!-- <div id="search-sensor" style="height: 1px; width: 100%;"></div> -->
 
             <div class="sticky-search-container">
-                <div class="search-bar">
-                    <input type="text" placeholder="ПОИСК">
-                    <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
-                        <circle cx="14" cy="14" r="10" stroke-width="1.2"/>
-                        <path d="M27 27L21 21" stroke-width="1.2" stroke-linecap="round"/>
-                    </svg>
-                </div>
+                <form action="{% url 'search' %}" method="get" class="search-bar">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="ПОИСК"
+                    >
+                    <button type="submit" class="search-btn">
+                        <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
+                            <circle cx="14" cy="14" r="10" stroke-width="1.2"/>
+                            <path d="M27 27L21 21" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
 
             <div class="categories-section">
