@@ -1360,7 +1360,8 @@ button, svg {
     margin-top: 0; 
     
     transition: all 0.3s ease;
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05); /* Легкая линия для разделения */
+    /* border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);  */
+    
 }
 
 /* Строка с кнопкой назад и поиском */
@@ -1369,7 +1370,7 @@ button, svg {
     align-items: center;
     gap: 12px;
     height: 44px; /* Фиксированная высота как в iOS */
-    padding: 0 16px;
+    padding: 10px 16px;
 }
 
 /* Панель "3 продукта" тоже делаем белой */
@@ -1385,40 +1386,12 @@ button, svg {
     font-size: 16px;
 }
 
-/* Основной контейнер шапки */
-.sticky-search-container {
-    position: sticky;
-    top: 0;
-    z-index: 1200;
-    background-color: #FFFFFF;
-    
-    /* 1. Создаем безопасный отступ сверху (под челку/кнопки ТГ) */
-    padding-top: calc(env(safe-area-inset-top) + 10px); 
-    
-    /* 2. Убираем все отрицательные маржины, если они были */
-    margin-top: 0 !important;
-    
-    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
+.header-content-2 { display: flex; align-items: center; gap: 8px; background-color: white; }
 
-/* Строка с кнопкой назад и поиском */
-.search-header-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    height: 44px; /* Стандартная высота строки в iOS */
-    padding: 0 16px 8px 16px; /* Небольшой отступ снизу */
-}
-
-/* Панель с количеством продуктов тоже делаем белой */
-.search-meta-panel {
-    background-color: #FFFFFF;
-    padding: 12px 16px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-/* Убедись, что контент не прыгает под шапку */
-.scrollable-content {
-    padding-top: 0;
+.custom-header-2 {
+    width: 100%; background-color: white;
+    display: flex; justify-content: center; align-items: center;
+    height: calc(env(safe-area-inset-top) + 44px);
+    padding-top: env(safe-area-inset-top);
+    z-index: 1000; flex-shrink: 0;
 }
