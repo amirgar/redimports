@@ -10,6 +10,8 @@
 </head>
 <body>
 <div class="app-container">
+    <!-- <br>
+    <br> -->
     <div class="sticky-search-container">
         <div class="search-header-row">
             <a href="{% url 'home' %}" class="back-button">
@@ -149,11 +151,11 @@
                     searchContainer.classList.add('is-stuck');
                     // Устанавливаем фон через JS как запасной вариант, 
                     // но лучше оставить это в CSS классе .is-stuck
-                    searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
+                    // searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
                 } else {
                     header.classList.remove('header-hidden');
                     searchContainer.classList.remove('is-stuck');
-                    searchContainer.style.backgroundColor = "transparent";
+                    // searchContainer.style.backgroundColor = "transparent";
                 }
             }, { passive: true });
         }
