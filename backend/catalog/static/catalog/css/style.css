@@ -1344,3 +1344,43 @@ button, svg {
     display: block;
     pointer-events: none;
 }
+
+
+/* Основной контейнер, который теперь всегда белый */
+.sticky-search-container {
+    position: sticky;
+    top: 0;
+    z-index: 1200;
+    background-color: #FFFFFF; /* Белый фон */
+    
+    /* Добавляем отступ сверху, чтобы контент не залезал под кнопку Close */
+    padding-top: env(safe-area-inset-top); 
+    
+    /* Убираем отрицательный маржин, который мы добавляли ранее для "стекла" */
+    margin-top: 0; 
+    
+    transition: all 0.3s ease;
+    border-bottom: 0.5px solid rgba(0, 0, 0, 0.05); /* Легкая линия для разделения */
+}
+
+/* Строка с кнопкой назад и поиском */
+.search-header-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px; /* Фиксированная высота как в iOS */
+    padding: 0 16px;
+}
+
+/* Панель "3 продукта" тоже делаем белой */
+.search-meta-panel {
+    background-color: #FFFFFF;
+    padding: 10px 16px;
+    border-bottom: 1px solid #E0E0E0;
+    margin-top: -1px; /* Склеиваем с поиском */
+}
+
+.product-count {
+    color: rgba(50, 50, 50, 0.5);
+    font-size: 16px;
+}

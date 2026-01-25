@@ -159,6 +159,17 @@
         }
 
         scrollableContent.addEventListener('scroll', () => {
+            const scrollTop = scrollableContent.scrollTop;
+            
+            // Если прокрутили вниз — можно добавить легкую тень для глубины
+            if (scrollTop > 10) {
+                searchContainer.style.boxShadow = "0 4px 10px rgba(0,0,0,0.05)";
+            } else {
+                searchContainer.style.boxShadow = "none";
+            }
+        }, { passive: true });
+
+        scrollableContent.addEventListener('scroll', () => {
             // Получаем расстояние от поиска до верха экрана
             const searchRect = searchContainer.getBoundingClientRect();
             
