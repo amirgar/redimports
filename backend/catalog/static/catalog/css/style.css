@@ -1476,9 +1476,6 @@ button, svg {
     /* У этой панели тоже не должно быть верхней линии, она отделена нижней линией поиска */
 }
 
-
-
-
 .back-button-catalog {
     display: flex;
     align-items: center;
@@ -1493,4 +1490,127 @@ button, svg {
 
 .back-button-catalog:active {
     opacity: 0.3;
+}
+
+/* Основной контейнер на весь экран */
+.empty-search-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* Занимает большую часть высоты экрана, чтобы быть по центру */
+    min-height: 70vh; 
+    padding: 20px;
+    background-color: #f2f2f2;
+}
+
+.empty-content-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 320px;
+    width: 100%;
+}
+
+/* Заголовок "ничего нет" */
+.empty-status-title {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 34px; /* Крупно */
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+/* Подзаголовок */
+.empty-status-subtitle {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 17px;
+    color: #8E8E93; /* Приглушенный серый */
+    line-height: 1.4;
+    margin-bottom: 40px;
+}
+
+/* Кнопка "в каталог" */
+.red-catalog-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background-color: #F04B41; /* Твой фирменный красный */
+    color: #FFFFFF;
+    width: 100%; /* На всю ширину контент-бокса */
+    padding: 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    transition: background-color 0.2s ease;
+}
+
+.red-catalog-btn:active {
+    background-color: #D63A31; /* Эффект нажатия */
+}
+
+/* Главный контейнер на всю ширину и высоту */
+.empty-results-wrapper {
+    display: flex;
+    justify-content: center; /* Центр по горизонтали */
+    align-items: center;     /* Центр по вертикали */
+    width: 100%;
+    min-height: 60vh;        /* Занимает 60% высоты экрана */
+    background-color: #f2f2f2;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Внутренний бокс с контентом */
+.empty-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;     /* Центрирует текст и кнопку внутри */
+    text-align: center;
+    max-width: 350px;        /* Чтобы текст не расползался слишком широко */
+    width: 100%;
+}
+
+.empty-title {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 36px;
+    font-weight: 700;
+    color: #000000;
+    margin-bottom: 12px;
+    letter-spacing: -1px;
+}
+
+.empty-subtitle {
+    font-family: 'TT Firs Neue', sans-serif;
+    font-size: 18px;
+    color: #8E8E93;
+    line-height: 1.4;
+    margin-bottom: 40px;
+}
+
+/* Кнопка как на макете */
+.btn-back-home {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background-color: #E64646; /* Красный из макета */
+    color: #FFFFFF;
+    width: 100%;
+    padding: 18px;
+    border-radius: 14px;
+    text-decoration: none;
+    font-family: 'TT Firs Neue', sans-serif;
+    font-weight: 600;
+    font-size: 18px;
+    transition: transform 0.1s ease;
+}
+
+.btn-back-home:active {
+    transform: scale(0.98); /* Эффект нажатия */
 }

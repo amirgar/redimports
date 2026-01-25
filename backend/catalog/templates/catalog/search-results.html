@@ -51,70 +51,89 @@
             </span>
         </div>
         <br>
-        <div class="products-grid">
-            {% for product in all_products %}
-                <div class="product-card">
+        {% if all_products %}
+            <div class="products-grid">
+                {% for product in all_products %}
+                    <div class="product-card">
 
-                    <div class="product-image-container"
-                        data-product-id="{{ product.id }}">
+                        <div class="product-image-container"
+                            data-product-id="{{ product.id }}">
 
-                        {# 1️⃣ NEW #}
-                        <!-- {% if product.is_new %}
-                            <span class="badge-new">NEW</span>
-                        {% endif %} -->
+                            {# 1️⃣ NEW #}
+                            <!-- {% if product.is_new %}
+                                <span class="badge-new">NEW</span>
+                            {% endif %} -->
 
-                        <button class="wishlist-btn">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
-                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                            </svg>
-                        </button>
+                            <button class="wishlist-btn">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">
+                                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                </svg>
+                            </button>
 
-                        {# КАРТИНКИ #}
-                        <div class="product-image-container">
-                            {% for image in product.images.all %}
-                                {% if product.is_new %}
-                                    <span class="badge-new">NEW</span>
-                                {% endif %}
-                                <img
-                                    src="{{ image.image.url }}"
-                                    class="product-img{% if forloop.first %} active{% endif %}"
-                                    draggable="false"
-                                >
-                            {% endfor %}
-
-                            {% if product.images.count > 1 %}
-                            <div class="pagination-dots">
+                            {# КАРТИНКИ #}
+                            <div class="product-image-container">
                                 {% for image in product.images.all %}
-                                    <span class="dot{% if forloop.first %} active{% endif %}"></span>
+                                    {% if product.is_new %}
+                                        <span class="badge-new">NEW</span>
+                                    {% endif %}
+                                    <img
+                                        src="{{ image.image.url }}"
+                                        class="product-img{% if forloop.first %} active{% endif %}"
+                                        draggable="false"
+                                    >
                                 {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
 
-                    </div>
-
-                    <div class="product-info">
-
-                        {# 2️⃣ ЦЕНА #}
-                        <div class="price-row">
-                            <div class="price-row">
-                                {% if product.discount_price %}
-                                    <span class="old-price">{{ product.discount_price }} ₽</span>
-                                    <span class="current-price">{{ product.price }} ₽</span>
-                                {% else %}
-                                    <span class="current-price black">{{ product.price }} ₽</span>
+                                {% if product.images.count > 1 %}
+                                <div class="pagination-dots">
+                                    {% for image in product.images.all %}
+                                        <span class="dot{% if forloop.first %} active{% endif %}"></span>
+                                    {% endfor %}
+                                </div>
                                 {% endif %}
                             </div>
+
                         </div>
 
-                        <h3 class="brand-name">{{ product.brand.name }}</h3>
-                        <p class="product-description">{{ product.name }}</p>
+                        <div class="product-info">
+
+                            {# 2️⃣ ЦЕНА #}
+                            <div class="price-row">
+                                <div class="price-row">
+                                    {% if product.discount_price %}
+                                        <span class="old-price">{{ product.discount_price }} ₽</span>
+                                        <span class="current-price">{{ product.price }} ₽</span>
+                                    {% else %}
+                                        <span class="current-price black">{{ product.price }} ₽</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <h3 class="brand-name">{{ product.brand.name }}</h3>
+                            <p class="product-description">{{ product.name }}</p>
+                        </div>
+
                     </div>
-
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-results-wrapper">
+                <div class="empty-content">
+                    <h2 class="empty-title">ничего нет :(</h2>
+                    
+                    <p class="empty-subtitle">
+                        попробуйте другой запрос<br>
+                        или посмотрите другие товары
+                    </p>
+                    
+                    <a href="{% url 'home' %}" class="btn-back-home">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M15 18L9 12L15 6" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        в каталог
+                    </a>
                 </div>
-            {% endfor %}
-
-        </div>
+            </div>
+        {% endif %}
         <div class="bottom-spacer"></div>
     </div>
     <nav class="nav-bar" style="background-color: white;">
