@@ -54,7 +54,7 @@
         {% if all_products %}
             <div class="products-grid">
                 {% for product in all_products %}
-                    <div class="product-card">
+                    <div class="product-card" data-url="{{ product.get_absolute_url }}">
 
                         <div class="product-image-container"
                             data-product-id="{{ product.id }}">
@@ -241,6 +241,18 @@
 
                 images[index].classList.add('active');
                 dots[index]?.classList.add('active');
+            });
+        });
+    });
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const url = card.dataset.url; // читаем data-url
+                if (url) {
+                    window.location.href = url; // переходим
+                }
             });
         });
     });

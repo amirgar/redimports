@@ -290,3 +290,46 @@ def search_results(request):
         'all_products_counter': products.count(),
         'query': query,
     })
+
+from django.shortcuts import get_object_or_404
+
+def product_detail(request, pk):
+    product = get_object_or_404(
+        Product.objects.prefetch_related('images', 'brand'),
+        pk=pk
+    )
+
+    params = product.parameter_list or {}
+    sizes = params.get('sizes', [])
+    attributes = {
+        key: value
+        for key, value in params.items()
+        if key != 'sizes'
+    }
+    context = {
+        'product': product,
+        'sizes': sizes,
+        'attributes': attributes,
+    }
+
+    return render(request, 'catalog/product-card.html', context)
+
+
+
+def product_card(request): 
+    new_products = Product.objects.filter(is_new=True).prefetch_related('images', 'brand')
+    all_products = Product.objects.prefetch_related('images', 'brand')
+
+
+    context = {
+        'new_products': new_products,
+        'new_products_counter': new_products.count(),
+
+        'all_products': all_products,
+        'all_products_counter': all_products.count(),
+
+        'brands': Brand.objects.all(),
+        'brands_count': Brand.objects.count(),
+    }
+
+    return render(request, 'catalog/product-card.html')

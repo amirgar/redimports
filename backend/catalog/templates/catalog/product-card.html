@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    {% block content %}
+    <div class="app-container">
+        <main class="scrollable-content">
+            <header class="custom-header">
+                <div class="header-content">
+                    <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
+                    <span class="header-logo-text">red imports</span>
+                </div>
+            </header>
+            <div class="product-header">
+                <button class="ph-btn back" onclick="window.history.back()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+                <div class="ph-title">{{ product.name }}</div>
+                <button class="ph-btn share">
+                    <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 12V20C4 20.5304 4.21071 21.0391 4.58579 21.4142C4.96086 21.7893 5.46957 22 6 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V12" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 6L12 2L8 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 2V15" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> -->
+                </button>
+            </div>
+
+            <div class="product-page-content">
+                
+                <div class="main-gallery-slider" onclick="openFullGallery()">
+                    <div class="badges-container">
+                        {% if product.is_new %}
+                            <span class="badge new">NEW</span>
+                        {% endif %}
+                    </div>
+                    <div class="gallery-wrapper">
+                        {% for image in product.images.all %}
+                            <img src="{{ image.image.url }}">
+                        {% endfor %}
+                    </div>
+                    <button class="favorite-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+                    </button>
+                </div>
+
+                <div class="product-details">
+                    <h1 class="brand-name">{{ product.brand }}</h1>
+                    <p class="product-full-name">{{ product.name }}</p>
+                    
+                    <div class="price-block">
+                        {% if product.discount_price %}
+                            <span class="old-price">{{ product.price }} ₽</span>
+                            <span class="new-price">{{ product.discount_price }} ₽</span>
+                        {% else %}
+                            <span class="current-price black">{{ product.price }} ₽</span>
+                        {% endif %}
+
+                    </div>
+
+                    {% if sizes %}
+
+                    <div class="size-selector-block">
+                        <div class="size-header">
+                            <span class="size-label">rus</span>
+                            <!-- <a href="#" class="size-guide">таблица размеров (?)</a> -->
+                        </div>
+                        <div class="size-scroll-list">
+                            {% for size in sizes %}
+                                <button class="size-item{% if forloop.first %} selected{% endif %}">
+                                    {{ size }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="description-tabs">
+                        <button class="tab-btn active" onclick="switchTab(event, 'product-info')">о товаре</button>
+                        <button class="tab-btn" onclick="switchTab(event, 'brand-info')">о бренде</button>
+                    </div>
+
+                    <div id="product-info" class="tab-content active">
+                        <div class="description-text">
+                            {{ product.description }}
+                            {% if attributes %}
+                                <div class="attributes-list">
+                                    {% for key, value in attributes.items %}
+                                        <div class="attr-row"><span>{{ key|capfirst }}</span><span>{{ value }}</span></div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="brand-info" class="tab-content">
+                        <div class="description-text">
+                            {{ product.brand.description }}
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="height: 80px;"></div>
+            </div>
+
+
+            <div id="fullScreenGallery" class="gallery-modal">
+                <div class="gallery-modal-header">
+                    <span>все фото товара (6)</span>
+                    <button onclick="closeFullGallery()" class="close-modal-btn">✕</button>
+                </div>
+                <div class="gallery-modal-content">
+                    <img src="{% static 'catalog/img/photo.png' %}" alt="">
+                    <img src="{% static 'catalog/img/photo-2.png' %}" alt="">
+                    <img src="{% static 'catalog/img/photo-3.png' %}" alt="">
+                    <img src="{% static 'catalog/img/photo-1.png' %}" alt="">
+                </div>
+            </div>
+        </main>
+        <br>
+        <br>
+        <br>
+
+        <div class="sticky-add-to-cart">
+            <button class="add-btn">
+                <span class="btn-plus">в корзину +</span>
+            </button>
+        </div>
+
+        <footer class="bottom-fixed-container">
+            <nav class="nav-bar">
+                <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
+                <div class="nav-item logo-box">
+                        <a href="{% url 'home' %}">
+                            <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+                        </a>
+                    </div>
+
+                <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+                <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
+            </nav>
+        </footer>
+    </div>
+    {% endblock %}
+    <script>
+        function openFullGallery() {
+            const modal = document.getElementById('fullScreenGallery');
+            modal.style.display = 'flex';
+            // Блокируем скролл основной страницы
+            document.body.style.overflow = 'hidden'; 
+        }
+
+        function closeFullGallery() {
+            const modal = document.getElementById('fullScreenGallery');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; 
+        }
+        
+        // Простой переключатель размеров (визуально)
+        const sizeBtns = document.querySelectorAll('.size-item:not(.disabled)');
+        sizeBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelector('.size-item.selected').classList.remove('selected');
+                this.classList.add('selected');
+            });
+        });
+
+        function switchTab(event, tabId) {
+            // 1. Скрываем все блоки контента
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => content.classList.remove('active'));
+
+            // 2. У всех кнопок убираем класс active
+            const buttons = document.querySelectorAll('.tab-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            // 3. Показываем нужный блок и делаем кнопку активной
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
