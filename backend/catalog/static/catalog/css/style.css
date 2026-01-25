@@ -1478,3 +1478,19 @@ button, svg {
 
 
 
+
+.back-button-catalog {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    /* padding-bottom: 8px; */
+    text-decoration: none;
+    color: rgba(50, 50, 50, 0.5); /* Цвет совпадает с заголовком */
+    transition: opacity 0.2s ease;
+}
+
+.back-button-catalog:active {
+    opacity: 0.3;
+}
