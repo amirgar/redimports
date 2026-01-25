@@ -18,15 +18,21 @@
     </header>
     <br>
     <div class="scrollable-content">
-        <div class="sticky-search-container">
-            <div class="search-bar">
-                <input type="text" placeholder="ПОИСК">
-                <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
-                    <circle cx="14" cy="14" r="10" stroke="currentColor" stroke-width="1.2"/>
-                    <path d="M27 27L21 21" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
-                </svg>
+        <div class="sticky-search-container" style="background-color: #f2f2f2;">
+                <form action="{% url 'search' %}" method="get" class="search-bar">
+                    <input
+                        type="text"
+                        name="q"
+                        placeholder="ПОИСК"
+                    >
+                    <button type="submit" class="search-btn">
+                        <svg class="search-icon-svg" viewBox="0 0 32 32" fill="none">
+                            <circle cx="14" cy="14" r="10" stroke-width="1.2"/>
+                            <path d="M27 27L21 21" stroke-width="1.2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </form>
             </div>
-        </div>
 
         <div class="catalog-section">
             <div class="catalog-header-row">
