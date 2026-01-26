@@ -10,13 +10,13 @@
 </head>
 <body>
     <div class="app-container">
-        <header class="custom-header">
+        <main class="scrollable-content">
+            <header class="custom-header">
                 <div class="header-content">
                     <img src="{% static 'catalog/img/logo_red.svg' %}" class="header-logo-img">
                     <span class="header-logo-text">red imports</span>
                 </div>
             </header>
-        <main class="scrollable-content">
             <section class="hero-banner">
                 {% if hero %}
                 <div class="hero-bg-container">
@@ -158,8 +158,8 @@
                         <div class="price-row">
                             <div class="price-row">
                                 {% if product.discount_price %}
-                                    <span class="old-price">{{ product.discount_price }} ₽</span>
-                                    <span class="current-price">{{ product.price }} ₽</span>
+                                    <span class="old-price">{{ product.price }} ₽</span>
+                                    <span class="current-price">{{ product.discount_price }} ₽</span>
                                 {% else %}
                                     <span class="current-price black">{{ product.price }} ₽</span>
                                 {% endif %}
@@ -258,8 +258,8 @@
                         <div class="price-row">
                             <div class="price-row">
                                 {% if product.discount_price %}
-                                    <span class="old-price">{{ product.price }} ₽</span>
-                                    <span class="current-price">{{ product.discount_price }} ₽</span>
+                                    <span class="old-price">{{ product.discount_price }} ₽</span>
+                                    <span class="current-price">{{ product.price }} ₽</span>
                                 {% else %}
                                     <span class="current-price black">{{ product.price }} ₽</span>
                                 {% endif %}
