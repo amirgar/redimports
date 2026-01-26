@@ -10,7 +10,7 @@
 </head>
 <body>
     {% block content %}
-    <div class="app-container">
+    <div class="app-container"> 
         <main class="scrollable-content">
             <header class="custom-header">
                 <div class="header-content">
@@ -108,19 +108,18 @@
 
             <div id="fullScreenGallery" class="gallery-modal">
                 <div class="gallery-modal-header">
-                    <span>все фото товара (6)</span>
+                    <span>все фото товара ({{ product.images.all|length }}) </span>
                     <button onclick="closeFullGallery()" class="close-modal-btn">✕</button>
                 </div>
                 <div class="gallery-modal-content">
-                    <img src="{% static 'catalog/img/photo.png' %}" alt="">
-                    <img src="{% static 'catalog/img/photo-2.png' %}" alt="">
-                    <img src="{% static 'catalog/img/photo-3.png' %}" alt="">
-                    <img src="{% static 'catalog/img/photo-1.png' %}" alt="">
+                    {% for image in product.images.all %}
+                        <img src="{{ image.image.url }}">
+                    {% endfor %}
                 </div>
             </div>
                 <div class="sticky-add-to-cart">
             <button class="add-btn">
-                <span class="btn-plus">в корзину +</span>
+                <span style="padding-bottom: 10px;">в корзину +</span>
             </button>
         </div>
 

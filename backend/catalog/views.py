@@ -306,6 +306,7 @@ def product_detail(request, pk):
         for key, value in params.items()
         if key != 'sizes'
     }
+    # products_count = product.count()
     context = {
         'product': product,
         'sizes': sizes,
