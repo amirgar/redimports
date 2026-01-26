@@ -333,4 +333,12 @@ def product_card(request):
         'brands_count': Brand.objects.count(),
     }
 
-    return render(request, 'catalog/product-card.html')
+    return render(request, 'catalog/product-card.html', context)
+
+def category(request): 
+    new_products = Product.objects.filter(is_new=True).prefetch_related('images', 'brand')
+    context = {
+        'new_products': new_products,
+        'new_products_counter': new_products.count(),
+    }
+    return render(request, 'catalog/category.html', context)

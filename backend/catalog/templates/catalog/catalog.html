@@ -47,7 +47,7 @@
 
             <nav class="catalog-list">
                 {% for category in categories %}
-                    <a href="#" class="catalog-item {% if category.is_sale %}highlight-red{% endif %}">
+                    <a href="{% url 'category' %}" class="catalog-item {% if category.is_sale %}highlight-red{% endif %}">
                         <span>{{ category.name }}</span>
                         <svg class="chevron-icon" viewBox="0 0 24 24" fill="none">
                             <path d="M9 18L15 12L9 6"
