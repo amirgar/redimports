@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from catalog.views import home, catalog, search_results, product_card, product_detail, category
+from catalog.views import home, catalog, search_results, product_card, product_detail, category_details
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -13,7 +13,7 @@ urlpatterns = [
     path('search/', search_results, name='search'),
     path('product/<int:pk>/', product_detail, name='product_detail'),
     path('product/', product_card, name='product'),
-    path('category/', category, name='category'),
+    path('category/<int:pk>/', category_details, name='category_detail'),
     path('', home, name='home'),
 ]
 

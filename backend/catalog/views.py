@@ -335,10 +335,18 @@ def product_card(request):
 
     return render(request, 'catalog/product-card.html', context)
 
-def category(request): 
-    new_products = Product.objects.filter(is_new=True).prefetch_related('images', 'brand')
-    context = {
-        'new_products': new_products,
-        'new_products_counter': new_products.count(),
-    }
-    return render(request, 'catalog/category.html', context)
+# views.py
+from django.shortcuts import render, get_object_or_404
+from .models import Category, Product
+
+def category_details(request, pk):
+    category = get_object_or_404(Category, pk=pk)
+
+    products = Product.objects.filter(
+        product_type_id=category.id
+    ).select_related('brand').prefetch_related('images')
+
+    return render(request, 'catalog/category.html', {
+        'category': category,
+        'products': products,
+    })
