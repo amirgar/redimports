@@ -33,8 +33,7 @@
                         </span>
                         
                         <div class="filter-controls">
-                            <div class="filter-count-square">2</div>
-                            <a href="{% url 'filter' %}">
+                            <a href="{% url 'filter' category.id %}" style="padding-left: 30px;">
                                 <button class="filter-settings-btn">
                                 </button>
                             </a>    
@@ -65,7 +64,7 @@
                 <div class="price-row">
                     {% if product.discount_price %}
                         <span class="old-price">{{ product.price }} ₽</span>
-                        <span class="current-price">{{ product.price }} ₽</span>
+                        <span class="current-price">{{ product.discount_price }} ₽</span>
                     {% else %}
                         <span class="current-price black">{{ product.price }} ₽</span>
                     {% endif %}
@@ -99,102 +98,56 @@
     </footer>
     </div>
 </body>
-
 <script>
-        
-    document.addEventListener('DOMContentLoaded', () => {
-        // 1. Инициализация Telegram
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
-        tg.disableVerticalSwipes();
-        tg.setHeaderColor('#F2F2F2');
-        tg.setBackgroundColor('#F2F2F2');
-
-        // 2. Элементы интерфейса
-        const header = document.querySelector('.custom-header');
-        const scrollableContent = document.querySelector('.scrollable-content');
-        const searchContainer = document.querySelector('.sticky-search-container');
-
-        // 3. Обработка скролла (Поиск и Шапка)
-        if (scrollableContent && searchContainer && header) {
-            scrollableContent.addEventListener('scroll', () => {
-                const scrollTop = scrollableContent.scrollTop;
-                
-                if (scrollTop > 50) {
-                    header.classList.add('header-hidden');
-                    searchContainer.classList.add('is-stuck');
-                    // Устанавливаем фон через JS как запасной вариант, 
-                    // но лучше оставить это в CSS классе .is-stuck
-                    searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
-                } else {
-                    header.classList.remove('header-hidden');
-                    searchContainer.classList.remove('is-stuck');
-                    searchContainer.style.backgroundColor = "transparent";
-                }
-            }, { passive: true });
-        }
-
-        scrollableContent.addEventListener('scroll', () => {
-            // Получаем расстояние от поиска до верха экрана
-            const searchRect = searchContainer.getBoundingClientRect();
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. КЛИКИ ПО КАРТОЧКАМ (Самое важное)
+    const productCards = document.querySelectorAll('.product-card');
+    productCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            // Если кликнули по кнопке внутри (если она будет), не переходим
+            if (e.target.closest('button')) return;
             
-            // searchRect.top <= 0 означает, что элемент коснулся верха или ушел выше
-            // Мы берем 10px для более плавного срабатывания на мобильных
-            if (searchRect.top <= 10) {
-                header.classList.add('header-hidden');
-                searchContainer.classList.add('is-stuck');
-            } else {
-                // Пока поиск не доехал до верха, возвращаем всё как было
-                header.classList.remove('header-hidden');
-                searchContainer.classList.remove('is-stuck');
+            const url = this.getAttribute('data-url');
+            if (url) {
+                window.location.href = url;
             }
-        }, { passive: true });
-
-        // 4. Свайп картинок товаров
-        document.querySelectorAll('.product-image-container').forEach(container => {
-            const images = Array.from(container.querySelectorAll('.product-img'));
-            const dots = Array.from(container.querySelectorAll('.dot'));
-
-            if (images.length <= 1) return;
-
-            let index = 0;
-            let startX = 0;
-
-            container.addEventListener('touchstart', e => {
-                startX = e.touches[0].clientX;
-            }, { passive: true });
-
-            container.addEventListener('touchend', e => {
-                const endX = e.changedTouches[0].clientX;
-                const diff = startX - endX;
-
-                if (Math.abs(diff) < 40) return;
-
-                images[index].classList.remove('active');
-                dots[index]?.classList.remove('active');
-
-                if (diff > 0) {
-                    index = (index + 1) % images.length;
-                } else {
-                    index = (index - 1 + images.length) % images.length;
-                }
-
-                images[index].classList.add('active');
-                dots[index]?.classList.add('active');
-            });
         });
     });
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.product-card').forEach(card => {
-            card.addEventListener('click', () => {
-                const url = card.dataset.url; // читаем data-url
-                if (url) {
-                    window.location.href = url; // переходим
-                }
-            });
+    // 2. БЕЗОПАСНАЯ РАБОТА С ФИЛЬТРАМИ (только если элементы есть на странице)
+    const params = new URLSearchParams(window.location.search);
+
+    // Чипсы (если они вдруг есть в шапке)
+    document.querySelectorAll('.chip').forEach(btn => {
+        const key = btn.dataset.key;
+        const value = btn.dataset.value;
+        if (params.getAll(key).includes(value)) btn.classList.add('active');
+
+        btn.addEventListener('click', () => {
+            btn.classList.toggle('active');
+            let values = params.getAll(key);
+            if (btn.classList.contains('active')) {
+                values.push(value);
+            } else {
+                values = values.filter(v => v !== value);
+            }
+            params.delete(key);
+            values.forEach(v => params.append(key, v));
         });
     });
 
-    </script>
+    // Кнопка "Применить" (она обычно на другой странице, поэтому проверяем if)
+    const applyBtn = document.getElementById('applyFilters');
+    if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+            const minPrice = document.getElementById('price-min')?.value;
+            const maxPrice = document.getElementById('price-max')?.value;
+            if (minPrice) params.set('min_price', minPrice);
+            if (maxPrice) params.set('max_price', maxPrice);
+            
+            const categoryId = "{{ category.id }}";
+            window.location.href = `/category/${categoryId}/?${params.toString()}`;
+        });
+    }
+});
+</script>

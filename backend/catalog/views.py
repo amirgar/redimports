@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.shortcuts import render
 from django.db.models import Q
+from django.db.models import Min, Max
+
 
 from .models import (
     Category, ProductType, Product, Brand,
@@ -339,17 +341,136 @@ def product_card(request):
 from django.shortcuts import render, get_object_or_404
 from .models import Category, Product
 
+from django.shortcuts import get_object_or_404, render
+from .models import Product, Category
+
+from django.shortcuts import get_object_or_404, render
+from .models import Category, Product
+
 def category_details(request, pk):
-    category = get_object_or_404(Category, pk=pk)
+    category = get_object_or_404(ProductType, id=pk)
+    
+    # 1. Фильтруем то, что SQLite умеет делать (Бренды, Цены, Скидки)
+    products_qs = Product.objects.filter(product_type=category).prefetch_related('images', 'brand')
 
-    products = Product.objects.filter(
-        product_type_id=category.id
-    ).select_related('brand').prefetch_related('images')
+    if request.GET.get('discount'):
+        products_qs = products_qs.filter(discount_price__isnull=False)
 
-    return render(request, 'catalog/category.html', {
+    selected_brands = request.GET.getlist('brand')
+    if selected_brands:
+        products_qs = products_qs.filter(brand_id__in=selected_brands)
+
+    p_from = request.GET.get('price_from') or request.GET.get('min_price')
+    p_to = request.GET.get('price_to') or request.GET.get('max_price')
+    if p_from: products_qs = products_qs.filter(price__gte=p_from)
+    if p_to: products_qs = products_qs.filter(price__lte=p_to)
+
+    # 2. Фильтруем JSON-параметры вручную (для совместимости с SQLite)
+    exclude_keys = ['brand', 'discount', 'price_from', 'price_to', 'min_price', 'max_price', 'v', 'q']
+    
+    # Собираем только те фильтры, которые есть в URL и не являются системными
+    active_json_filters = {
+        k: v for k, v in request.GET.lists() 
+        if k not in exclude_keys and v
+    }
+
+    if active_json_filters:
+        filtered_ids = []
+        # Проходим по товарам и проверяем соответствие JSON
+        for product in products_qs:
+            params = product.parameter_list or {}
+            is_match = True
+            
+            for key, values in active_json_filters.items():
+                val_in_db = params.get(key)
+                
+                if isinstance(val_in_db, list):
+                    # Если в базе список (например, sizes: ["40", "42"]), ищем пересечение
+                    if not any(str(v) in map(str, val_in_db) for v in values):
+                        is_match = False
+                        break
+                else:
+                    # Если в базе одиночное значение, проверяем вхождение
+                    if str(val_in_db) not in values:
+                        is_match = False
+                        break
+            
+            if is_match:
+                filtered_ids.append(product.id)
+        
+        # Оставляем только те товары, которые прошли проверку
+        products = Product.objects.filter(id__in=filtered_ids).prefetch_related('images', 'brand')
+    else:
+        products = products_qs
+
+    # 3. Данные для фильтров
+    brands = Brand.objects.filter(products__product_type=category).distinct()
+    price_stats = Product.objects.filter(product_type=category).aggregate(
+        min_p=Min('price'), max_p=Max('price')
+    )
+
+    context = {
         'category': category,
-        'products': products,
-    })
+        'products': products.distinct(),
+        'brands': brands,
+        'selected_brands': selected_brands,
+        'min_price': price_stats['min_p'] or 0,
+        'max_price': price_stats['max_p'] or 0,
+    }
 
-def filter(request):
-    return render(request, 'catalog/filter.html')
+    return render(request, 'catalog/category.html', context)
+
+from collections import defaultdict
+
+from collections import defaultdict
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Min, Max
+from .models import Product, ProductType, Brand
+
+
+
+def filters_view(request, category_id):
+    """Страница выбора фильтров"""
+    category = get_object_or_404(ProductType, id=category_id)
+    
+    # Берем ВСЕ товары категории для построения полного списка опций
+    base_qs = Product.objects.filter(product_type=category)
+    
+    # Сбор всех возможных вариантов (размеры, цвета и т.д.)
+    filters_data = defaultdict(set)
+    sizes_set = set()
+
+    for product in base_qs:
+        params = product.parameter_list or {}
+        for k, v in params.items():
+            if k == 'sizes' and isinstance(v, list):
+                sizes_set.update(map(str, v))
+            elif isinstance(v, list):
+                filters_data[k].update(map(str, v))
+            else:
+                filters_data[k].add(str(v))
+
+    # Красивая сортировка размеров (числа как числа)
+    sorted_sizes = sorted(
+        list(sizes_set), 
+        key=lambda x: int(x) if x.isdigit() else x
+    )
+
+    # Статистика цен для плейсхолдеров
+    price_stats = base_qs.aggregate(min_p=Min('price'), max_p=Max('price'))
+    min_p_val = price_stats['min_p'] or 0
+    max_p_val = price_stats['max_p'] or 0
+
+    context = {
+        "category": category,
+        "filters": {k: sorted(list(v)) for k, v in filters_data.items()},
+        "sizes": sorted_sizes,
+        "brands": Brand.objects.filter(products__in=base_qs).distinct(),
+        
+        # Передаем текущие выбранные параметры, чтобы JS мог их подсветить
+        "selected_brands": request.GET.getlist('brand'),
+        "min_price": price_stats['min_p'] or 0,
+        "max_price": price_stats['max_p'] or 0,
+    }
+
+    return render(request, "catalog/filter.html", context)
