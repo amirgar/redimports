@@ -1,0 +1,102 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+<div class="filters-page">
+    <header class="filters-header">
+        <button class="back-btn">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <h1 class="filters-title">фильтры</h1>
+        <button class="reset-btn">сбросить</button>
+    </header>
+
+    <div class="filters-content">
+        <div class="filter-section price-section">
+            <div class="price-inputs">
+                <div class="price-field"><span>от</span> 200 ₽</div>
+                <div class="price-field"><span>до</span> 100 000 ₽</div>
+            </div>
+            <div class="range-slider">
+                <div class="slider-track"></div>
+                <div class="slider-handle start"></div>
+                <div class="slider-handle end"></div>
+            </div>
+        </div>
+
+        <div class="filter-row clickable">
+            <span>сортировать</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div class="filter-row">
+            <span>в наличии</span>
+            <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+        </div>
+        <div class="filter-row">
+            <span>скидки</span>
+            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+        </div>
+
+        <div class="filter-row clickable">
+            <span>бренд</span>
+            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8E8E93" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div class="chips-section">
+            <h3>для кого</h3>
+            <div class="chips-grid">
+                <button class="chip">Мужчины</button>
+                <button class="chip">Женщины</button>
+                <button class="chip">Дети</button>
+            </div>
+        </div>
+
+        <div class="chips-section">
+            <div class="section-header">
+                <h3>размер</h3>
+            </div>
+            <div class="chips-grid size-grid">
+                <button class="chip active">39,5 ×</button>
+                <button class="chip">40</button>
+                <button class="chip">39</button>
+                <button class="chip">41</button>
+                <button class="chip">48</button>
+                <button class="chip">35,5</button>
+            </div>
+        </div>
+
+        <div class="chips-section">
+            <div class="section-header">
+                <h3>цвет</h3>
+            </div>
+            <div class="chips-grid">
+                <button class="chip active">Красный ×</button>
+                <button class="chip active">Серый ×</button>
+                <button class="chip">Белый</button>
+                <button class="chip">Бежевый</button>
+                <button class="chip">Розовый</button>
+                <button class="chip">Оранжевый</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="filters-footer">
+        <button class="apply-btn">
+            <span cla>показать 120 товаров</span>
+        </button>
+        <br>
+        <br>
+        
+    </footer>
+</div>
+</body>
+</html>

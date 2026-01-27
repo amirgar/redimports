@@ -350,3 +350,6 @@ def category_details(request, pk):
         'category': category,
         'products': products,
     })
+
+def filter(request):
+    return render(request, 'catalog/filter.html')

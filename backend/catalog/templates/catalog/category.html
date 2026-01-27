@@ -34,9 +34,10 @@
                         
                         <div class="filter-controls">
                             <div class="filter-count-square">2</div>
-                            
-                            <button class="filter-settings-btn">
-                            </button>
+                            <a href="{% url 'filter' %}">
+                                <button class="filter-settings-btn">
+                                </button>
+                            </a>    
                         </div>
                     </div>
                 </div>
@@ -63,7 +64,7 @@
             <div class="product-info">
                 <div class="price-row">
                     {% if product.discount_price %}
-                        <span class="old-price">{{ product.discount_price }} ₽</span>
+                        <span class="old-price">{{ product.price }} ₽</span>
                         <span class="current-price">{{ product.price }} ₽</span>
                     {% else %}
                         <span class="current-price black">{{ product.price }} ₽</span>
