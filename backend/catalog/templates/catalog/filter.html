@@ -105,6 +105,7 @@
                             data-key="brand"
                             data-value="{{ brand.id }}"
                             type="button"
+                            style="color: #000;"
                         >
                             {{ brand.name }}
                         </button>
@@ -122,6 +123,7 @@
                             data-key="sizes"
                             data-value="{{ size }}"
                             type="button"
+                            style="color: #000;"
                         >
                             {{ size }}
                         </button>
@@ -137,6 +139,7 @@
                     {% for value in values %}
                         <button
                             class="chip"
+                            style="color: #000;"
                             data-key="{{ param }}"
                             data-value="{{ value }}"
                             type="button"
