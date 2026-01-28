@@ -65,5 +65,27 @@ class TelegramAuthView(APIView):
             "refresh": str(refresh),
         })
 
-def profile(request):
-    return render(request, 'profile.html')
+
+# telegram_auth/views.py (или catalog/views.py)
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import User
+
+@csrf_exempt
+def save_profile_api(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        tg_id = data.get("telegram_id")
+        
+        # Находим юзера по telegram_id
+        user = User.objects.filter(telegram_id=tg_id).first()
+        if user:
+            user.first_name = data.get("first_name", user.first_name)
+            user.last_name = data.get("last_name", user.last_name)
+            user.patronymic = data.get("patronymic", user.patronymic)
+            user.gender = data.get("gender", user.gender)
+            user.save()
+            return JsonResponse({"status": "success"})
+            
+    return JsonResponse({"status": "error"}, status=400)
