@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path, include
-from catalog.views import home, catalog, search_results, product_card, product_detail, category_details, filters_view
+from catalog.views import home, catalog, search_results, product_card, product_detail, category_details, filters_view, profile
 from django.conf.urls.static import static
 from django.conf import settings
 
@@ -15,6 +15,7 @@ urlpatterns = [
     path('product/', product_card, name='product'),
     path("category/<int:category_id>/filters/", filters_view, name="filter"),
     path('category/<int:pk>/', category_details, name='category_detail'),
+    path("api/telegram/", include("telegram_auth.urls")),
     path('', home, name='home'),
 ]
 

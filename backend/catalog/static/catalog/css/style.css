@@ -2386,3 +2386,171 @@ input:checked + .slider:before { transform: translateX(20px); }
     border-color: #000;
 }
 
+
+/* Общие настройки страницы */
+.profile-page {
+    background-color: #F2F2F2;
+    min-height: 100vh;
+    font-family: 'T2-Reg', -apple-system, sans-serif;
+    color: #323232;
+    padding-bottom: 100px; /* Чтобы не перекрывало нижнее меню */
+}
+
+/* Шапка */
+.profile-header {
+    display: flex;
+    align-items: center;
+    padding: 20px 16px;
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(10px);
+}
+
+.header-title {
+    font-size: 20px;
+    font-weight: 400;
+    margin-left: 12px;
+}
+
+/* Карточка пользователя */
+.user-card {
+    display: flex;
+    align-items: center;
+    padding: 20px 16px;
+    gap: 16px;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 12px; /* По дизайну Rectangle 34 */
+}
+
+.user-name {
+    font-size: 20px;
+    font-weight: 510;
+    margin: 0;
+}
+
+.user-id {
+    font-size: 14px;
+    color: #323232;
+    opacity: 0.8;
+}
+
+/* Инпуты и секции */
+.info-section {
+    padding: 0 16px;
+    margin-top: 20px;
+}
+
+.section-header h3 {
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 4px;
+}
+
+.section-header p {
+    font-size: 14px;
+    color: rgba(50, 50, 50, 0.5);
+    margin-bottom: 16px;
+}
+
+.input-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #FFFFFF; /* Белая линия как в Figma */
+}
+
+.input-row input {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-size: 20px;
+    color: #323232;
+    width: 100%;
+}
+
+.input-row input::placeholder {
+    color: rgba(50, 50, 50, 0.5);
+}
+
+.check-icon {
+    color: #1EC241;
+    font-weight: bold;
+}
+
+/* Радио-кнопки (пол) */
+.gender-selector {
+    display: flex;
+    gap: 24px;
+    padding: 20px 0;
+}
+
+.radio-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.radio-mark {
+    width: 24px;
+    height: 24px;
+    background: #FFFFFF;
+    border-radius: 50%;
+    position: relative;
+    display: inline-block;
+}
+
+.radio-container input { display: none; }
+
+.radio-container input:checked + .radio-mark::after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #323232;
+    border-radius: 50%;
+    top: 4px;
+    left: 4px;
+}
+
+/* Навигационные ссылки */
+.profile-nav {
+    margin-top: 32px;
+    padding: 0 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-decoration: none;
+    color: #323232;
+    font-size: 32px; /* Крупный текст как в TH1 - reg */
+    font-weight: 274;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.badge {
+    background: #FF6567;
+    color: #FFFFFF;
+    font-size: 16px;
+    padding: 2px 8px;
+    min-width: 26px;
+    text-align: center;
+    border-radius: 4px;
+}

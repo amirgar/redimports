@@ -474,3 +474,7 @@ def filters_view(request, category_id):
     }
 
     return render(request, "catalog/filter.html", context)
+
+
+def profile(request): 
+    return render(request, 'catalog/profile.html')

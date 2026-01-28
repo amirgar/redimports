@@ -39,20 +39,28 @@ class TelegramAuthView(APIView):
             return Response({"error": "Invalid user data"}, status=status.HTTP_400_BAD_REQUEST)
 
         telegram_id = user_data["id"]
-        user, created = User.objects.get_or_create(
+
+        user, created = User.objects.update_or_create(
             telegram_id=telegram_id,
             defaults={
-                "username": f"tg_{telegram_id}",
+                "username": user_data.get("username"),
                 "first_name": user_data.get("first_name", ""),
-                "last_name": user_data.get("last_name", "")
+                "last_name": user_data.get("last_name", ""),
+                "photo_url": user_data.get("photo_url"),
             }
         )
 
-        # Генерация JWT
         refresh = RefreshToken.for_user(user)
+
         return Response({
-            "user_id": user.id,
-            "telegram_id": telegram_id,
+            "user": {
+                "id": user.id,
+                "telegram_id": telegram_id,
+                "username": user.username,
+                "first_name": user.first_name,
+                "last_name": user.last_name,
+                "photo_url": user.photo_url,
+            },
             "access": str(refresh.access_token),
             "refresh": str(refresh),
         })

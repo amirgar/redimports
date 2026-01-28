@@ -1,0 +1,90 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store</title>
+
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        .user-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="profile-page">
+    <header class="profile-header">
+        <button class="back-btn" onclick="window.history.back()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M15 18L9 12L15 6"
+                      stroke="black"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+        </button>
+        <h1 class="header-title">профиль</h1>
+    </header>
+
+    <main class="profile-content">
+        <section class="user-card">
+            <div class="user-avatar" id="userAvatar"></div>
+
+            <div class="user-meta">
+                <h2 class="user-name" id="userName">Загрузка...</h2>
+                <span class="user-id" id="userId"></span>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const tg = window.Telegram.WebApp;
+    const user = tg.initDataUnsafe.user;
+
+    if (user) {
+        // Аватар
+        if (user.photo_url) {
+            document.getElementById('userAvatar').style.backgroundImage =
+                `url('${user.photo_url}')`;
+        }
+
+        // Имя + username
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        const username = user.username ? `@${user.username}` : '';
+
+        document.getElementById('userName').textContent =
+            `${fullName} ${username}`;
+
+        document.getElementById('userId').textContent =
+            `TgId: ${user.id}`;
+
+        // Отправка данных на backend
+        fetch("/api/telegram/auth/", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token }}"
+            },
+            body: JSON.stringify({
+                initData: tg.initData
+            })
+        });
+    }
+
+    tg.ready();
+</script>
+
+</body>
+</html>
