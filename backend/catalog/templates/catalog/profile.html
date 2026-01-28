@@ -75,12 +75,21 @@
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
             },
             body: JSON.stringify({
-                initData: tg.initData
+                initData: Telegram.WebApp.initData
             })
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log("AUTH RESPONSE", data);
+
+            if (data.access) {
+                localStorage.setItem("access", data.access);
+                localStorage.setItem("refresh", data.refresh);
+            }
         });
+
     }
 
     tg.ready();
