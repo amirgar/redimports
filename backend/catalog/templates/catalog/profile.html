@@ -2,152 +2,87 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Профиль - Red Imports</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.2">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
     <style>
         /* Базовые стили для отображения, если файл CSS не подгрузился */
-
         body { margin: 0; padding: 0; background-color: #F2F2F2; font-family: sans-serif; }
-
-
+        
         .profile-page {
-
-        background-color: #F2F2F2;
-
-        min-height: 100vh;
-
-        color: #323232;
-
-        padding-bottom: 50px;
-
+            background-color: #F2F2F2;
+            min-height: 100vh;
+            color: #323232;
+            padding-bottom: 50px;
         }
-
-
 
         .profile-header {
-
-        display: flex;
-
-        align-items: center;
-
-        padding: 40px 16px 10px; /* Отступ сверху для Telegram Bar */
-
-        background: rgba(255, 255, 255, 0.75);
-
-        backdrop-filter: blur(10px);
-
+            display: flex;
+            align-items: center;
+            padding: 40px 16px 10px; /* Отступ сверху для Telegram Bar */
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
         }
-
-
 
         .header-title { font-size: 20px; font-weight: 400; margin-left: 12px; text-transform: lowercase; }
-
         .back-btn { background: none; border: none; cursor: pointer; padding: 0; }
 
-
-
         .user-card { display: flex; align-items: center; padding: 20px 16px; gap: 16px; }
-
-
+        
         .user-avatar {
-
-        width: 80px;
-
-        height: 80px;
-
-        border-radius: 12px;
-
-        background-size: cover;
-
-        background-position: center;
-
-        background-color: #ddd;
-
+            width: 80px;
+            height: 80px;
+            border-radius: 12px;
+            background-size: cover;
+            background-position: center;
+            background-color: #ddd;
         }
-
-
 
         .user-name { font-size: 20px; font-weight: 600; margin: 0; }
-
         .user-id { font-size: 14px; opacity: 0.6; }
 
-
-
         .info-section { padding: 0 16px; margin-top: 10px; }
-
         .section-header h3 { font-size: 20px; font-weight: 400; margin: 0; }
-
         .section-header p { font-size: 14px; color: rgba(50, 50, 50, 0.5); margin: 4px 0 16px; }
 
-
-
         .input-row {
-
-        display: flex;
-
-        justify-content: space-between;
-
-        align-items: center;
-
-        padding: 14px 0;
-
-        border-bottom: 1px solid #FFFFFF;
-
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 0;
+            border-bottom: 1px solid #FFFFFF;
         }
-
-
 
         .input-row input {
-
-        background: transparent;
-
-        border: none;
-
-        outline: none;
-
-        font-size: 18px;
-
-        width: 100%;
-
-        color: #323232;
-
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 18px;
+            width: 100%;
+            color: #323232;
         }
-
-
 
         .check-icon { color: #1EC241; font-weight: bold; }
 
-
-
         .gender-selector { display: flex; gap: 24px; padding: 20px 0; }
-
         .radio-container { display: flex; align-items: center; gap: 8px; font-size: 18px; }
-
         .radio-mark { width: 20px; height: 20px; background: #fff; border-radius: 50%; display: inline-block; position: relative; }
-
-
+        
         input[type="radio"] { display: none; }
-
         input[type="radio"]:checked + .radio-mark::after {
-
-        content: ""; position: absolute; width: 12px; height: 12px;
-
-        background: #323232; border-radius: 50%; top: 4px; left: 4px;
-
+            content: ""; position: absolute; width: 12px; height: 12px; 
+            background: #323232; border-radius: 50%; top: 4px; left: 4px;
         }
-
-
 
         .profile-nav { margin-top: 30px; padding: 0 16px; display: flex; flex-direction: column; gap: 20px; }
-
-        .nav-link {
-
-        display: flex; justify-content: space-between; align-items: center;
-
-        text-decoration: none; color: #323232; font-size: 32px; font-weight: 300;
-
+        .nav-link { 
+            display: flex; justify-content: space-between; align-items: center; 
+            text-decoration: none; color: #323232; font-size: 32px; font-weight: 300; 
         }
-
         .badge { background: #FF6567; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 16px; }
-
         .nav-right { display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
@@ -155,7 +90,7 @@
 
 <div class="profile-page">
     <header class="profile-header">
-        <button class="back-btn" onclick="saveAndBack()">
+        <button class="back-btn" onclick="window.history.back()">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
@@ -179,82 +114,58 @@
             </div>
 
             <div class="profile-inputs">
-                <div class="input-row">
-                    <input type="text" id="firstName" placeholder="Имя">
+                <div class="input-row checked">
+                    <input type="text" placeholder="Имя">
+                </div>
+                <div class="input-row checked">
+                    <input type="text" placeholder="Фамилия">
                 </div>
                 <div class="input-row">
-                    <input type="text" id="lastName" placeholder="Фамилия">
-                </div>
-                <div class="input-row">
-                    <input type="text" id="patronymic" placeholder="Отчество">
+                    <input type="text" placeholder="Отчество">
                 </div>
             </div>
 
             <div class="gender-selector">
                 <label class="radio-container">
-                    <input type="radio" name="gender" value="female" id="genderFemale">
+                    <input type="radio" name="gender" value="female">
                     <span class="radio-mark"></span> женщина
                 </label>
                 <label class="radio-container">
-                    <input type="radio" name="gender" value="male" id="genderMale" checked>
+                    <input type="radio" name="gender" value="male" checked>
                     <span class="radio-mark"></span> мужчина
                 </label>
             </div>
         </section>
 
-        </main>
-</div>
-
-<script>
+        <nav class="profile-nav">
+            <a href="#" class="nav-link">
+                <span>заказы</span>
+                <div class="nav-right">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+                </div>
+            </a>
+            <a href="#" class="nav-link">
+                <span>избранное</span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+        </nav>
+    </main>
+</div> <script>
     const tg = window.Telegram.WebApp;
-    tg.expand();
+    tg.expand(); // Разворачиваем приложение на весь экран
 
     const user = tg.initDataUnsafe.user;
 
-    // Заполняем данные при загрузке
     if (user) {
-        if (user.photo_url) document.getElementById('userAvatar').style.backgroundImage = `url('${user.photo_url}')`;
+        if (user.photo_url) {
+            document.getElementById('userAvatar').style.backgroundImage = `url('${user.photo_url}')`;
+        }
         
-        document.getElementById('userName').textContent = `${user.first_name || ''} ${user.last_name || ''}`.trim() || "Пользователь";
+        const fullName = `${user.first_name || ''} ${user.last_name || ''}`.trim();
+        const username = user.username ? `@${user.username}` : '';
+        document.getElementById('userName').textContent = fullName || username || "Пользователь";
         document.getElementById('userId').textContent = `TgId: ${user.id}`;
-        
-        // Предзаполняем инпуты данными из ТГ (если в базе пусто)
-        document.getElementById('firstName').value = user.first_name || '';
-        document.getElementById('lastName').value = user.last_name || '';
     }
-
-    // ФУНКЦИЯ СОХРАНЕНИЯ И ВОЗВРАТА
-    async function saveAndBack() {
-        if (!user) {
-            window.history.back();
-            return;
-        }
-
-        const data = {
-            telegram_id: user.id,
-            first_name: document.getElementById('firstName').value,
-            last_name: document.getElementById('lastName').value,
-            patronymic: document.getElementById('patronymic').value,
-            gender: document.querySelector('input[name="gender"]:checked').value
-        };
-
-        try {
-            // Отправляем данные на сервер
-            await fetch('/api/save_profile/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            });
-        } catch (error) {
-            console.error('Ошибка сохранения:', error);
-        }
-
-        // После отправки (удачной или нет) идем назад
-        window.history.back();
-    }
-
     tg.ready();
 </script>
 </body>
