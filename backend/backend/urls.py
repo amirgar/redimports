@@ -16,6 +16,7 @@ urlpatterns = [
     path("category/<int:category_id>/filters/", filters_view, name="filter"),
     path('category/<int:pk>/', category_details, name='category_detail'),
     path("api/telegram/", include("telegram_auth.urls")),
+    path('profile/', profile, name='profile'),
     path('', home, name='home'),
 ]
 

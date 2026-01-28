@@ -64,3 +64,6 @@ class TelegramAuthView(APIView):
             "access": str(refresh.access_token),
             "refresh": str(refresh),
         })
+
+def profile(request):
+    return render(request, 'profile.html')
