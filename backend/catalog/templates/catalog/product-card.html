@@ -164,6 +164,24 @@
 <!-- JS -->
 <script>
 /* === GALLERY === */
+document.addEventListener('DOMContentLoaded', () => {
+    if (!window.Telegram || !Telegram.WebApp) return;
+
+    const tg = Telegram.WebApp;
+    tg.ready();
+
+    if (!tg.initDataUnsafe?.user) return;
+
+    fetch('/telegram-auth/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify(tg.initDataUnsafe.user)
+    });
+});
+
 window.openFullGallery = function () {
     const modal = document.getElementById('fullScreenGallery');
     if (!modal) return;

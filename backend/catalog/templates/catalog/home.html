@@ -307,6 +307,24 @@
         tg.setHeaderColor('#F2F2F2');
         tg.setBackgroundColor('#F2F2F2');
 
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Telegram || !Telegram.WebApp) return;
+
+            const tg = Telegram.WebApp;
+            tg.ready();
+
+            if (!tg.initDataUnsafe?.user) return;
+
+            fetch('/telegram-auth/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(tg.initDataUnsafe.user)
+            });
+        });
+
         // 2. Элементы интерфейса
         const header = document.querySelector('.custom-header');
         const scrollableContent = document.querySelector('.scrollable-content');

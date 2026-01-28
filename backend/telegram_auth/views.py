@@ -89,3 +89,36 @@ def save_profile_api(request):
             return JsonResponse({"status": "success"})
             
     return JsonResponse({"status": "error"}, status=400)
+
+
+# telegram_auth/views.py
+import json
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from .models import User
+
+
+@csrf_exempt
+def telegram_auth(request):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=400)
+
+    data = json.loads(request.body)
+    telegram_id = data.get('id')
+
+    if not telegram_id:
+        return JsonResponse({'error': 'No telegram_id'}, status=400)
+
+    user, _ = User.objects.get_or_create(
+        telegram_id=telegram_id,
+        defaults={
+            'username': f'tg_{telegram_id}',
+            'firstName': data.get('first_name'),
+            'lastName': data.get('last_name'),
+            'photo_url': data.get('photo_url'),
+        }
+    )
+
+    request.session['telegram_id'] = telegram_id
+
+    return JsonResponse({'status': 'ok'})

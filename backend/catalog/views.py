@@ -294,27 +294,26 @@ def search_results(request):
     })
 
 from django.shortcuts import get_object_or_404
+from telegram_auth.models import User
+
 
 def product_detail(request, pk):
-    product = get_object_or_404(
-        Product.objects.prefetch_related('images', 'brand'),
-        pk=pk
-    )
+    product = Product.objects.get(id=pk)
 
-    params = product.parameter_list or {}
-    sizes = params.get('sizes', [])
-    attributes = {
-        key: value
-        for key, value in params.items()
-        if key != 'sizes'
-    }
-    favorite_products = Product.objects.filter(favorited_by__user=request.user)
-    # products_count = product.count()
+    telegram_id = request.session.get('telegram_id')
+    user = None
+    favorite_products = []
+
+    if telegram_id:
+        user = User.objects.filter(telegram_id=telegram_id).first()
+        if user:
+            favorite_products = Product.objects.filter(
+                favorited_by__user=user
+            )
+
     context = {
         'product': product,
-        'sizes': sizes,
-        'attributes': attributes,
-        'favoutite_products': favorite_products,
+        'favorite_products': favorite_products,
     }
 
     return render(request, 'catalog/product-card.html', context)
@@ -482,33 +481,29 @@ def profile(request):
     return render(request, 'catalog/profile.html')
 
 from django.http import JsonResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_POST
+from django.views.decorators.csrf import csrf_exempt
+from telegram_auth.models import User
+from catalog.models import Product, Favorite
 
-from .models import Product, Favorite
-
-
-@login_required
-@require_POST
+@csrf_exempt
 def toggle_favorite(request):
+    telegram_id = request.session.get('telegram_id')
+
+    if not telegram_id:
+        return JsonResponse({'error': 'unauthorized'}, status=401)
+
+    user = User.objects.filter(telegram_id=telegram_id).first()
+    if not user:
+        return JsonResponse({'error': 'user not found'}, status=404)
+
     product_id = request.POST.get('product_id')
-
-    if not product_id:
-        return JsonResponse({'error': 'Нет product_id'}, status=400)
-
     product = Product.objects.get(id=product_id)
 
-    favorite = Favorite.objects.filter(
-        user=request.user,
-        product=product
-    )
+    favorite = Favorite.objects.filter(user=user, product=product)
 
     if favorite.exists():
         favorite.delete()
         return JsonResponse({'status': 'removed'})
     else:
-        Favorite.objects.create(
-            user=request.user,
-            product=product
-        )
+        Favorite.objects.create(user=user, product=product)
         return JsonResponse({'status': 'added'})
