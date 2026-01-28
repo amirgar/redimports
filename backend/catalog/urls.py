@@ -6,6 +6,8 @@ from .views import (
     CartView, CartAddView, CartRemoveView, CartUpdateQuantityView,
     OrderCreateView
 )
+from .views import toggle_favorite
+
 
 urlpatterns = [
     # -------------------- Категории / Товары / Бренды --------------------
@@ -40,5 +42,7 @@ from .views import home, catalog
 
 urlpatterns += [
     path('', home, name='home'),
+    path('favorite/toggle/', toggle_favorite, name='toggle_favorite'),
+
     # path('catalog/', catalog, name='catalog'),
 ]

@@ -2554,3 +2554,47 @@ input:checked + .slider:before { transform: translateX(20px); }
     text-align: center;
     border-radius: 4px;
 }
+
+.favorite-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.favorite-btn.active svg {
+    fill: red;
+    stroke: red;
+}
+
+.favorite-btn svg {
+    transition: fill 0.25s ease, stroke 0.25s ease, transform 0.2s ease;
+}
+
+.favorite-btn.active svg {
+    fill: red;
+    stroke: red;
+    transform: scale(1.2);
+}
+
+.favorite-btn.active {
+    animation: like-pop 0.3s ease;
+}
+
+@keyframes like-pop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+.favorite-btn svg {
+    transition: fill 0.25s ease, stroke 0.25s ease, transform 0.2s ease;
+    fill: transparent; /* по умолчанию пустое */
+    stroke: black;
+}
+
+.favorite-btn.active svg {
+    fill: red;      /* красное сердце */
+    stroke: red;    /* красная обводка */
+    transform: scale(1.2);
+}

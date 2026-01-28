@@ -308,11 +308,13 @@ def product_detail(request, pk):
         for key, value in params.items()
         if key != 'sizes'
     }
+    favorite_products = Product.objects.filter(favorited_by__user=request.user)
     # products_count = product.count()
     context = {
         'product': product,
         'sizes': sizes,
         'attributes': attributes,
+        'favoutite_products': favorite_products,
     }
 
     return render(request, 'catalog/product-card.html', context)
@@ -478,3 +480,35 @@ def filters_view(request, category_id):
 
 def profile(request): 
     return render(request, 'catalog/profile.html')
+
+from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+
+from .models import Product, Favorite
+
+
+@login_required
+@require_POST
+def toggle_favorite(request):
+    product_id = request.POST.get('product_id')
+
+    if not product_id:
+        return JsonResponse({'error': 'Нет product_id'}, status=400)
+
+    product = Product.objects.get(id=product_id)
+
+    favorite = Favorite.objects.filter(
+        user=request.user,
+        product=product
+    )
+
+    if favorite.exists():
+        favorite.delete()
+        return JsonResponse({'status': 'removed'})
+    else:
+        Favorite.objects.create(
+            user=request.user,
+            product=product
+        )
+        return JsonResponse({'status': 'added'})
