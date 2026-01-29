@@ -1,40 +1,60 @@
 import json
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+import traceback # Для вывода полной ошибки
 from django.shortcuts import get_object_or_404
 from catalog.models import User, Product # Убедись, что импортировал модель Product
 
 # --- АВТОРИЗАЦИЯ ЧЕРЕЗ СЕССИИ (Для работы шаблонов) ---
 @csrf_exempt
 def telegram_auth(request):
+    # 1. Проверка метода
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=400)
 
     try:
-        data = json.loads(request.body)
-        # JS initDataUnsafe.user возвращает объект с полем 'id' (int)
+        # 2. Читаем и выводим сырые данные (ДЛЯ ОТЛАДКИ)
+        body_unicode = request.body.decode('utf-8')
+        print(f"🔍 DEBUG: Raw Body: {body_unicode}")
+
+        data = json.loads(body_unicode)
+        
+        # Получаем ID. Важно привести к строке или int в зависимости от твоей модели
         telegram_id = data.get('id')
+        print(f"🔍 DEBUG: Parsed TG ID: {telegram_id}")
 
         if not telegram_id:
+            print("❌ DEBUG: Error - No telegram_id in data")
             return JsonResponse({'error': 'No telegram_id'}, status=400)
 
-        # Создаем или обновляем пользователя
-        user, created = User.objects.get_or_create(
+        # 3. Сохранение в БД
+        # Используем update_or_create, чтобы не было ошибки, если юзер уже есть
+        print("🔍 DEBUG: Attempting DB save...")
+        
+        user, created = User.objects.update_or_create(
             telegram_id=telegram_id,
             defaults={
                 'username': data.get('username', f'tg_{telegram_id}'),
                 'first_name': data.get('first_name', ''),
                 'last_name': data.get('last_name', ''),
-                'photo_url': data.get('photo_url', ''),
+                # ПРОВЕРЬ: есть ли поле photo_url в твоей модели User? 
+                # Если нет — удали строчку ниже:
+                'photo_url': data.get('photo_url', ''), 
             }
         )
-        
-        # !ВАЖНО: Сохраняем ID в сессию Django
+        print(f"✅ DEBUG: DB Save Success. User ID: {user.id}, Created: {created}")
+
+        # 4. Сохранение сессии
         request.session['telegram_id'] = telegram_id
-        request.session.modified = True 
+        request.session.modified = True
         
         return JsonResponse({'status': 'ok', 'user_id': user.id})
+
     except Exception as e:
+        # 5. Если случилась ошибка — выводим её в консоль
+        print(f"❌❌❌ CRITICAL ERROR in telegram_auth:")
+        print(str(e))
+        traceback.print_exc() # Покажет точную строку ошибки
         return JsonResponse({'error': str(e)}, status=400)
 
 
