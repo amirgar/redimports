@@ -169,25 +169,81 @@
 
 <!-- JS -->
 <script>
-/* === GALLERY === */
+/* === GALLERY & SYSTEM === */
+// Глобальная переменная для хранения статуса авторизации
+window.isAuthSent = false;
+
 document.addEventListener('DOMContentLoaded', () => {
-    if (!window.Telegram || !Telegram.WebApp) return;
+    // === 1. TELEGRAM AUTH ===
+    if (window.Telegram && Telegram.WebApp) {
+        const tg = Telegram.WebApp;
+        tg.ready();
+        tg.expand(); // На весь экран
 
-    const tg = Telegram.WebApp;
-    tg.ready();
+        // Проверяем, есть ли данные пользователя и не отправляли ли мы их уже
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user && !window.isAuthSent) {
+            
+            fetch('/api/telegram/auth/', { // Путь теперь совпадает с urls.py
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(tg.initDataUnsafe.user)
+            })
+            .then(res => {
+                if(res.ok) window.isAuthSent = true;
+                console.log("Auth sent:", res.status);
+            })
+            .catch(err => console.error("Auth error:", err));
+        }
+    }
 
-    if (!tg.initDataUnsafe?.user) return;
+    // === 2. FAVORITE LOGIC ===
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Чтобы не открывалась галерея при клике на сердце
 
-    fetch('/api/telegram/auth/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-        body: JSON.stringify(tg.initDataUnsafe.user)
+            const productId = btn.dataset.productId;
+
+            // Используем FormData для x-www-form-urlencoded
+            const formData = new URLSearchParams();
+            formData.append('product_id', productId);
+
+            fetch('/favorite/toggle/', { // Этот путь теперь существует
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === 'added') {
+                    btn.classList.add('active');
+                } else if (data.status === 'removed') {
+                    btn.classList.remove('active');
+                }
+
+                // Вибрация (Haptic)
+                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling favorite:', error);
+                // Если ошибка 401 (не авторизован), можно попробовать перезагрузить страницу
+                // window.location.reload(); 
+            });
+        });
     });
 });
 
+/* === UTILS === */
 window.openFullGallery = function () {
     const modal = document.getElementById('fullScreenGallery');
     if (!modal) return;
@@ -219,52 +275,20 @@ function switchTab(event, tabId) {
     event.currentTarget.classList.add('active');
 }
 
-/* === FAVORITE === */
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-
-            const productId = btn.dataset.productId;
-
-            fetch('/favorite/toggle/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `product_id=${productId}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'added') {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-
-                if (window.Telegram?.WebApp) {
-                    Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }
-            });
-        });
-    });
-});
-
-/* === CSRF === */
 function getCookie(name) {
     let cookieValue = null;
-    if (document.cookie) {
-        document.cookie.split(';').forEach(cookie => {
-            cookie = cookie.trim();
-            if (cookie.startsWith(name + '=')) {
-                cookieValue = decodeURIComponent(cookie.slice(name.length + 1));
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
-        });
+        }
     }
     return cookieValue;
 }
 </script>
-
 </body>
 </html>
