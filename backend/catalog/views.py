@@ -298,12 +298,13 @@ from telegram_auth.models import User
 
 
 def product_detail(request, pk):
-    product = Product.objects.get(id=pk)
-
+    product = get_object_or_404(
+        Product.objects.prefetch_related('images', 'brand'),
+        pk=pk
+    )
     telegram_id = request.session.get('telegram_id')
-    user = None
     favorite_products = []
-
+    user = None
     if telegram_id:
         user = User.objects.filter(telegram_id=telegram_id).first()
         if user:
@@ -311,13 +312,23 @@ def product_detail(request, pk):
                 favorited_by__user=user
             )
 
+    params = product.parameter_list or {}
+    sizes = params.get('sizes', [])
+    attributes = {
+        key: value
+        for key, value in params.items()
+        if key != 'sizes'
+    }
+
+    # products_count = product.count()
     context = {
         'product': product,
-        'favorite_products': favorite_products,
+        'sizes': sizes,
+        'attributes': attributes,
+        'favoutite_products': favorite_products,
     }
 
     return render(request, 'catalog/product-card.html', context)
-
 
 
 def product_card(request): 
