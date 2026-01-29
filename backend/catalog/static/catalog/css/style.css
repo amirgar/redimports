@@ -2610,3 +2610,9 @@ input:checked + .slider:before { transform: translateX(20px); }
     transform: scale(1.2);
     transition: transform 0.1s ease;
 }
+
+.wishlist-btn.active svg,
+.favorite-btn.active svg {
+    fill: #ff4b4b !important;
+    stroke: #ff4b4b !important;
+}
