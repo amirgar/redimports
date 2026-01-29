@@ -281,7 +281,11 @@
             <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
             <nav class="nav-bar">
                 <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
-                <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
+                <div class="nav-item">
+                    <a href="{% url 'favorites_list' %}">
+                        <img src="{% static 'catalog/img/heart_icon.svg' %}" width="32">
+                    </a>
+                </div>
                 <div class="nav-item logo-box">
                     <a href="{% url 'home' %}">
                         <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">

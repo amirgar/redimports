@@ -3,7 +3,7 @@ from django.urls import path, include
 from catalog.views import (
     home, catalog, search_results, product_card, product_detail, 
     category_details, filters_view, profile, 
-    toggle_favorite
+    toggle_favorite, favorites_list
 )
 from telegram_auth.views import telegram_auth
 from django.conf.urls.static import static
@@ -24,6 +24,8 @@ urlpatterns = [
     path('product/', product_card, name='product'),
     path("category/<int:category_id>/filters/", filters_view, name="filter"),
     path('category/<int:pk>/', category_details, name='category_detail'),
+    path('favorites/', favorites_list, name='favorites_list'),
+    path('favorite/toggle/', toggle_favorite, name='toggle_favorite'),
     path('profile/', profile, name='profile'),
     path('', home, name='home'),
 ]

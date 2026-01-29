@@ -1,0 +1,356 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Избранное</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=6.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Специфичные стили для страницы избранного */
+        .fav-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 20px;
+            background: #F2F2F2;
+        }
+        .fav-stats {
+            padding: 10px 20px;
+            font-size: 14px;
+            color: #888;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Фильтры-чипсы */
+        .filter-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 0 20px 15px;
+            gap: 8px;
+            scrollbar-width: none;
+        }
+        .filter-chip {
+            background: #333;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .filter-chip.color-chip::before {
+            content: "";
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            background: #E33E3E; /* Для примера красный */
+        }
+
+        /* Пустое состояние */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 60px 40px;
+        }
+        .duck-img {
+            width: 180px;
+            margin-bottom: 30px;
+        }
+        .empty-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .empty-subtitle {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.4;
+            margin-bottom: 40px;
+        }
+        .btn-to-catalog {
+            background: #FF3B30;
+            color: white;
+            width: 100%;
+            padding: 15px;
+            border-radius: 0; /* Как на макете */
+            text-decoration: none;
+            text-transform: uppercase;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Сетка избранного */
+        .new-price { color: #FF3B30; font-weight: bold; }
+        .old-price { text-decoration: line-through; color: #333; margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <main class="scrollable-content">
+        
+        <div class="fav-header">
+            <button class="ph-btn back" onclick="window.history.back()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M15 18L9 12L15 6" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <div class="header-logo-text" style="font-size: 18px;">избранное</div>
+            <button class="ph-btn share">
+                <!-- <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg> -->
+            </button>
+        </div>
+
+        {% if favorites %}
+            <div class="products-grid" style="padding: 0 10px;">
+                {% for item in favorites %}
+                <div class="product-card" data-url="{{ item.product.get_absolute_url }}">
+                    <div class="product-image-container">
+                        {% if item.product.is_new %}
+                            <span class="badge-new" style="background: #4CD964;">NEW</span>
+                        {% endif %}
+                        <button class="wishlist-btn active" data-product-id="{{ item.product.id }}">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="#FF3B30" stroke="#FF3B30"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        </button>
+                        <img src="{{ item.product.images.first.image.url }}" class="product-img active">
+                    </div>
+                    <div class="product-info">
+                        <div class="price-row">
+                            <span class="old-price">{{ item.product.price }}</span>
+                            <span class="new-price">{{ item.product.discount_price|default:item.product.price }} ₽</span>
+                        </div>
+                        <h3 class="brand-name">{{ item.product.brand.name }}</h3>
+                        <p class="product-description">{{ item.product.name }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <img src="{% static 'catalog/img/duck_heart.svg' %}" class="duck-img" alt="Пусто">
+                <h2 class="empty-title">использyйте <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></h2>
+                <p class="empty-subtitle">добавляйте товары в избранное, чтобы купить их позже</p>
+            </div>
+        {% endif %}
+
+        <div class="bottom-spacer"></div>
+    </main>
+
+    <footer class="bottom-fixed-container">
+        <a href="{% url 'catalog' %}" class="btn-to-catalog">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><path d="M15 18L9 12L15 6"/></svg>
+            в каталог
+        </a>
+        <nav class="nav-bar">
+            <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
+            <div class="nav-item active"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32" style="filter: invert(27%) sepia(91%) saturate(2352%) hue-rotate(346deg) brightness(104%) contrast(107%);"></div>
+            <div class="nav-item logo-box"><a href="{% url 'home' %}"><img src="{% static 'catalog/img/logo_red.svg' %}" width="28"></a></div>
+            <div class="nav-item"><a href="{% url 'profile' %}"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></a></div>
+            <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
+        </nav>
+    </footer>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. Инициализация Telegram
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+        tg.disableVerticalSwipes();
+        tg.setHeaderColor('#F2F2F2');
+        tg.setBackgroundColor('#F2F2F2');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!window.Telegram || !Telegram.WebApp) return;
+
+            const tg = Telegram.WebApp;
+            tg.ready();
+
+            if (!tg.initDataUnsafe?.user) return;
+
+            fetch('/api/telegram/auth/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(tg.initDataUnsafe.user)
+            });
+        });
+
+        // 2. Элементы интерфейса
+        const header = document.querySelector('.custom-header');
+        const scrollableContent = document.querySelector('.scrollable-content');
+        const searchContainer = document.querySelector('.sticky-search-container');
+
+        // 3. Обработка скролла (Поиск и Шапка)
+        if (scrollableContent && searchContainer && header) {
+            scrollableContent.addEventListener('scroll', () => {
+                const scrollTop = scrollableContent.scrollTop;
+                
+                if (scrollTop > 50) {
+                    header.classList.add('header-hidden');
+                    searchContainer.classList.add('is-stuck');
+                    // Устанавливаем фон через JS как запасной вариант, 
+                    // но лучше оставить это в CSS классе .is-stuck
+                    searchContainer.style.backgroundColor = "rgba(242, 242, 242, 0.85)";
+                } else {
+                    header.classList.remove('header-hidden');
+                    searchContainer.classList.remove('is-stuck');
+                    searchContainer.style.backgroundColor = "transparent";
+                }
+            }, { passive: true });
+        }
+
+        scrollableContent.addEventListener('scroll', () => {
+            // Получаем расстояние от поиска до верха экрана
+            const searchRect = searchContainer.getBoundingClientRect();
+            
+            // searchRect.top <= 0 означает, что элемент коснулся верха или ушел выше
+            // Мы берем 10px для более плавного срабатывания на мобильных
+            if (searchRect.top <= 10) {
+                header.classList.add('header-hidden');
+                searchContainer.classList.add('is-stuck');
+            } else {
+                // Пока поиск не доехал до верха, возвращаем всё как было
+                header.classList.remove('header-hidden');
+                searchContainer.classList.remove('is-stuck');
+            }
+        }, { passive: true });
+
+        // 4. Свайп картинок товаров
+        document.querySelectorAll('.product-image-container').forEach(container => {
+            const images = Array.from(container.querySelectorAll('.product-img'));
+            const dots = Array.from(container.querySelectorAll('.dot'));
+
+            if (images.length <= 1) return;
+
+            let index = 0;
+            let startX = 0;
+
+            container.addEventListener('touchstart', e => {
+                startX = e.touches[0].clientX;
+            }, { passive: true });
+
+            container.addEventListener('touchend', e => {
+                const endX = e.changedTouches[0].clientX;
+                const diff = startX - endX;
+
+                if (Math.abs(diff) < 40) return;
+
+                images[index].classList.remove('active');
+                dots[index]?.classList.remove('active');
+
+                if (diff > 0) {
+                    index = (index + 1) % images.length;
+                } else {
+                    index = (index - 1 + images.length) % images.length;
+                }
+
+                images[index].classList.add('active');
+                dots[index]?.classList.add('active');
+            });
+        });
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.product-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const url = card.dataset.url; // читаем data-url
+                if (url) {
+                    window.location.href = url; // переходим
+                }
+            });
+        });
+
+        // Добавьте это внутри document.addEventListener('DOMContentLoaded', () => { ... })
+
+        const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+
+        wishlistBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                // ОСТАНАВЛИВАЕМ ПЕРЕХОД ПО ССЫЛКЕ КАРТОЧКИ
+                e.stopPropagation();
+                e.preventDefault();
+
+                const productId = btn.dataset.productId;
+                const tg = window.Telegram?.WebApp;
+
+                // Используем FormData для отправки
+                const formData = new URLSearchParams();
+                formData.append('product_id', productId);
+
+                try {
+                    const response = await fetch('/favorite/toggle/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData.toString()
+                    });
+
+                    if (response.status === 401) {
+                        // Если сессия слетела, можно вызвать авторизацию повторно
+                        console.error("Пользователь не авторизован");
+                        return;
+                    }
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        // Красим/разкрашиваем
+                        if (data.status === 'added') {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+
+                        // Вибрация
+                        if (tg?.HapticFeedback) {
+                            tg.HapticFeedback.impactOccurred('light');
+                        }
+                    }
+                } catch (error) {
+                    console.error("Ошибка при работе с избранным:", error);
+                }
+            });
+        });
+
+        // Не забудьте функцию getCookie, если её нет в home.html
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    });
+
+    </script>
+
+
+</body>
+</html>

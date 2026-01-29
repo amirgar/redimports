@@ -538,3 +538,17 @@ def toggle_favorite(request):
     else:
         Favorite.objects.create(user=user, product=product)
         return JsonResponse({'status': 'added'})
+
+def favorites_list(request):
+    tg_id = request.session.get('telegram_id')
+    favorites = []
+    
+    if tg_id:
+        # Получаем все объекты Favorite для этого пользователя
+        favorites = Favorite.objects.filter(user__telegram_id=tg_id).select_related('product')
+    
+    context = {
+        'favorites': favorites,
+        'favorites_count': len(favorites),
+    }
+    return render(request, 'catalog/favorites.html', context)
