@@ -2616,3 +2616,16 @@ input:checked + .slider:before { transform: translateX(20px); }
     fill: #ff4b4b !important;
     stroke: #ff4b4b !important;
 }
+
+/* Состояние по умолчанию (пустое сердечко) */
+.wishlist-btn svg, .favorite-btn svg {
+    fill: none;
+    stroke: black; /* или другой цвет контура */
+    transition: all 0.2s ease;
+}
+
+/* Состояние "Лайкнуто" (красное сердечко) */
+.wishlist-btn.active svg, .favorite-btn.active svg {
+    fill: #FF3B30 !important; /* Красная заливка */
+    stroke: #FF3B30 !important; /* Красный контур */
+}
