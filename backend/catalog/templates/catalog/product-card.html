@@ -154,13 +154,20 @@
 <footer class="bottom-fixed-container">
     <nav class="nav-bar">
         <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
-        <div class="nav-item"><img src="{% static 'catalog/img/heart_icon.svg' %}" width="32"></div>
+        <div class="nav-item">
+            <a href="{% url 'favorites_list' %}">
+                <img src="{% static 'catalog/img/heart_icon.svg' %}" width="32">
+            </a>
+        </div>
         <div class="nav-item logo-box">
             <a href="{% url 'home' %}">
                 <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
             </a>
         </div>
-        <div class="nav-item"><img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+        <div class="nav-item">
+            <a href="{% url 'profile' %}">
+                <img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+            </a>
         <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
     </nav>
 </footer>
