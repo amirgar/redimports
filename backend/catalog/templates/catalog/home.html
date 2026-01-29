@@ -158,8 +158,8 @@
                         <div class="price-row">
                             <div class="price-row">
                                 {% if product.discount_price %}
-                                    <span class="old-price">{{ product.discount_price }} ₽</span>
-                                    <span class="current-price">{{ product.price }} ₽</span>
+                                    <span class="old-price">{{ product.price }} ₽</span>
+                                    <span class="current-price">{{ product.discount_price }} ₽</span>
                                 {% else %}
                                     <span class="current-price black">{{ product.price }} ₽</span>
                                 {% endif %}
@@ -258,8 +258,8 @@
                         <div class="price-row">
                             <div class="price-row">
                                 {% if product.discount_price %}
-                                    <span class="old-price">{{ product.discount_price }} ₽</span>
-                                    <span class="current-price">{{ product.price }} ₽</span>
+                                    <span class="old-price">{{ product.price }} ₽</span>
+                                    <span class="current-price">{{ product.discount_price }} ₽</span>
                                 {% else %}
                                     <span class="current-price black">{{ product.price }} ₽</span>
                                 {% endif %}
