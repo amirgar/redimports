@@ -167,8 +167,114 @@
 
 </div>
 
+<!-- JS -->
 <script>
-// 1. Утилита для получения CSRF-токена (необходима для POST запросов)
+/* === GALLERY & SYSTEM === */
+// Глобальная переменная для хранения статуса авторизации
+window.isAuthSent = false;
+
+document.addEventListener('DOMContentLoaded', () => {
+    // === 1. TELEGRAM AUTH ===
+    if (window.Telegram && Telegram.WebApp) {
+        const tg = Telegram.WebApp;
+        tg.ready();
+        tg.expand(); // На весь экран
+
+        // Проверяем, есть ли данные пользователя и не отправляли ли мы их уже
+        if (tg.initDataUnsafe && tg.initDataUnsafe.user && !window.isAuthSent) {
+            
+            fetch('/api/telegram/auth/', { // Путь теперь совпадает с urls.py
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(tg.initDataUnsafe.user)
+            })
+            .then(res => {
+                if(res.ok) window.isAuthSent = true;
+                console.log("Auth sent:", res.status);
+            })
+            .catch(err => console.error("Auth error:", err));
+        }
+    }
+
+    // === 2. FAVORITE LOGIC ===
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Чтобы не открывалась галерея при клике на сердце
+
+            const productId = btn.dataset.productId;
+
+            // Используем FormData для x-www-form-urlencoded
+            const formData = new URLSearchParams();
+            formData.append('product_id', productId);
+
+            fetch('/favorite/toggle/', { // Этот путь теперь существует
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            })
+            .then(res => {
+                if (!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                if (data.status === 'added') {
+                    btn.classList.add('active');
+                } else if (data.status === 'removed') {
+                    btn.classList.remove('active');
+                }
+
+                // Вибрация (Haptic)
+                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
+                    Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling favorite:', error);
+                // Если ошибка 401 (не авторизован), можно попробовать перезагрузить страницу
+                // window.location.reload(); 
+            });
+        });
+    });
+});
+
+/* === UTILS === */
+window.openFullGallery = function () {
+    const modal = document.getElementById('fullScreenGallery');
+    if (!modal) return;
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeFullGallery = function () {
+    const modal = document.getElementById('fullScreenGallery');
+    if (!modal) return;
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+};
+
+/* === SIZE SELECT === */
+document.querySelectorAll('.size-item:not(.disabled)').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const selected = document.querySelector('.size-item.selected');
+        if (selected) selected.classList.remove('selected');
+        this.classList.add('selected');
+    });
+});
+
+/* === TABS === */
+function switchTab(event, tabId) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -183,132 +289,6 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    // --- ИНИЦИАЛИЗАЦИЯ TELEGRAM ---
-    const tg = window.Telegram?.WebApp;
-    if (tg) {
-        tg.ready();
-        tg.expand();
-        tg.disableVerticalSwipes();
-        tg.setHeaderColor('#F2F2F2');
-        tg.setBackgroundColor('#F2F2F2');
-    }
-
-    // --- АВТОРИЗАЦИЯ ---
-    async function performAuth() {
-        if (!tg?.initDataUnsafe?.user) return false;
-        try {
-            const response = await fetch('/api/telegram/auth/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify(tg.initDataUnsafe.user)
-            });
-            return response.ok;
-        } catch (err) {
-            console.error("Auth error:", err);
-            return false;
-        }
-    }
-    performAuth();
-
-    // --- ЛОГИКА КЛИКА ПО КАРТОЧКЕ (ПЕРЕХОД) ---
-    document.querySelectorAll('.product-card').forEach(card => {
-        card.addEventListener('click', (e) => {
-            // Если кликнули по кнопке избранного или любому элементу внутри неё — не переходим в товар
-            if (e.target.closest('.wishlist-btn')) {
-                return;
-            }
-            const url = card.dataset.url;
-            if (url) {
-                window.location.href = url;
-            }
-        });
-    });
-
-    // --- ЛОГИКА ИЗБРАННОГО (WISHLIST) ---
-    const wishlistBtns = document.querySelectorAll('.wishlist-btn');
-    wishlistBtns.forEach(btn => {
-        btn.addEventListener('click', async (e) => {
-            e.preventDefault();
-            e.stopPropagation(); // Останавливает "всплытие" клика к родителю .product-card
-
-            const productId = btn.closest('[data-product-id]').dataset.productId;
-            const formData = new URLSearchParams();
-            formData.append('product_id', productId);
-
-            const sendToggle = () => fetch('/favorite/toggle/', {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData.toString()
-            });
-
-            let response = await sendToggle();
-
-            // Если сессия истекла (401), пробуем авторизоваться и повторить один раз
-            if (response.status === 401) {
-                const authOk = await performAuth();
-                if (authOk) response = await sendToggle();
-            }
-
-            if (response.ok) {
-                const data = await response.json();
-                btn.classList.toggle('active', data.status === 'added');
-                
-                if (tg?.HapticFeedback) {
-                    tg.HapticFeedback.impactOccurred('light');
-                }
-            }
-        });
-    });
-
-    // --- СКРОЛЛ (ПОИСК И ШАПКА) ---
-    const header = document.querySelector('.custom-header');
-    const scrollableContent = document.querySelector('.scrollable-content');
-    const searchContainer = document.querySelector('.sticky-search-container');
-
-    if (scrollableContent && searchContainer && header) {
-        scrollableContent.addEventListener('scroll', () => {
-            const searchRect = searchContainer.getBoundingClientRect();
-            if (searchRect.top <= 10) {
-                header.classList.add('header-hidden');
-                searchContainer.classList.add('is-stuck');
-            } else {
-                header.classList.remove('header-hidden');
-                searchContainer.classList.remove('is-stuck');
-            }
-        }, { passive: true });
-    }
-
-    // --- СВАЙП КАРТИНКИ ТОВАРОВ ---
-    document.querySelectorAll('.product-image-container').forEach(container => {
-        const images = Array.from(container.querySelectorAll('.product-img'));
-        const dots = Array.from(container.querySelectorAll('.dot'));
-        if (images.length <= 1) return;
-
-        let index = 0;
-        let startX = 0;
-
-        container.addEventListener('touchstart', e => { startX = e.touches[0].clientX; }, { passive: true });
-        container.addEventListener('touchend', e => {
-            const endX = e.changedTouches[0].clientX;
-            const diff = startX - endX;
-            if (Math.abs(diff) < 40) return;
-
-            images[index].classList.remove('active');
-            dots[index]?.classList.remove('active');
-            index = diff > 0 ? (index + 1) % images.length : (index - 1 + images.length) % images.length;
-            images[index].classList.add('active');
-            dots[index]?.classList.add('active');
-        });
-    });
-});
 </script>
 </body>
 </html>
