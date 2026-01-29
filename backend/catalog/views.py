@@ -302,6 +302,17 @@ def product_detail(request, pk):
         Product.objects.prefetch_related('images', 'brand'),
         pk=pk
     )
+
+    is_favorite = False
+    tg_id = request.session.get('telegram_id')
+    
+    if tg_id:
+        # Проверяем, есть ли запись в таблице Favorite для этого юзера и товара
+        is_favorite = Favorite.objects.filter(
+            user__telegram_id=tg_id, 
+            product=product
+        ).exists()
+
     telegram_id = request.session.get('telegram_id')
     favorite_products = []
     user = None
@@ -322,6 +333,8 @@ def product_detail(request, pk):
 
     # products_count = product.count()
     context = {
+        'product': product,
+        'is_favorite': is_favorite,
         'product': product,
         'sizes': sizes,
         'attributes': attributes,

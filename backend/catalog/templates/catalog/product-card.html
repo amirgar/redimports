@@ -50,7 +50,7 @@
         </div>
 
         <!-- FAVORITE -->
-        <button class="favorite-btn {% if product in favorite_products %}active{% endif %}"
+        <button class="favorite-btn {% if is_favorite %}active{% endif %}"
                 data-product-id="{{ product.id }}"
                 aria-label="Добавить в избранное">
             <svg class="favorite-icon"
@@ -169,112 +169,9 @@
 
 <!-- JS -->
 <script>
-/* === GALLERY & SYSTEM === */
-// Глобальная переменная для хранения статуса авторизации
-window.isAuthSent = false;
+/* === ПОЛНАЯ ЗАМЕНА СКРИПТА === */
 
-document.addEventListener('DOMContentLoaded', () => {
-    // === 1. TELEGRAM AUTH ===
-    if (window.Telegram && Telegram.WebApp) {
-        const tg = Telegram.WebApp;
-        tg.ready();
-        tg.expand(); // На весь экран
-
-        // Проверяем, есть ли данные пользователя и не отправляли ли мы их уже
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user && !window.isAuthSent) {
-            
-            fetch('/api/telegram/auth/', { // Путь теперь совпадает с urls.py
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'),
-                },
-                body: JSON.stringify(tg.initDataUnsafe.user)
-            })
-            .then(res => {
-                if(res.ok) window.isAuthSent = true;
-                console.log("Auth sent:", res.status);
-            })
-            .catch(err => console.error("Auth error:", err));
-        }
-    }
-
-    // === 2. FAVORITE LOGIC ===
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation(); // Чтобы не открывалась галерея при клике на сердце
-
-            const productId = btn.dataset.productId;
-
-            // Используем FormData для x-www-form-urlencoded
-            const formData = new URLSearchParams();
-            formData.append('product_id', productId);
-
-            fetch('/favorite/toggle/', { // Этот путь теперь существует
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': getCookie('csrftoken'),
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData.toString()
-            })
-            .then(res => {
-                if (!res.ok) throw new Error('Network response was not ok');
-                return res.json();
-            })
-            .then(data => {
-                if (data.status === 'added') {
-                    btn.classList.add('active');
-                } else if (data.status === 'removed') {
-                    btn.classList.remove('active');
-                }
-
-                // Вибрация (Haptic)
-                if (window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
-                    Telegram.WebApp.HapticFeedback.impactOccurred('light');
-                }
-            })
-            .catch(error => {
-                console.error('Error toggling favorite:', error);
-                // Если ошибка 401 (не авторизован), можно попробовать перезагрузить страницу
-                // window.location.reload(); 
-            });
-        });
-    });
-});
-
-/* === UTILS === */
-window.openFullGallery = function () {
-    const modal = document.getElementById('fullScreenGallery');
-    if (!modal) return;
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-};
-
-window.closeFullGallery = function () {
-    const modal = document.getElementById('fullScreenGallery');
-    if (!modal) return;
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-};
-
-/* === SIZE SELECT === */
-document.querySelectorAll('.size-item:not(.disabled)').forEach(btn => {
-    btn.addEventListener('click', function () {
-        const selected = document.querySelector('.size-item.selected');
-        if (selected) selected.classList.remove('selected');
-        this.classList.add('selected');
-    });
-});
-
-/* === TABS === */
-function switchTab(event, tabId) {
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    event.currentTarget.classList.add('active');
-}
-
+// 1. Утилита для получения CSRF-токена
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -289,6 +186,122 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+        tg.ready();
+        tg.expand();
+    }
+
+    // --- ФУНКЦИЯ АВТОРИЗАЦИИ ---
+    async function performAuth() {
+        if (!tg?.initDataUnsafe?.user) return false;
+        
+        try {
+            const response = await fetch('/api/telegram/auth/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'),
+                },
+                body: JSON.stringify(tg.initDataUnsafe.user)
+            });
+            return response.ok;
+        } catch (err) {
+            console.error("Auth fetch failed:", err);
+            return false;
+        }
+    }
+
+    // Запускаем авторизацию сразу
+    performAuth();
+
+    // --- ЛОГИКА ИЗБРАННОГО ---
+    const favoriteBtns = document.querySelectorAll('.favorite-btn');
+    
+    favoriteBtns.forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+
+            const productId = btn.dataset.productId;
+            const formData = new URLSearchParams();
+            formData.append('product_id', productId);
+
+            // Функция для отправки запроса лайка
+            const sendToggleRequest = () => fetch('/favorite/toggle/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            });
+
+            let response = await sendToggleRequest();
+
+            // Если 401 (Unauthorized) — пробуем переавторизоваться и повторить
+            if (response.status === 401) {
+                console.log("Session expired, retrying auth...");
+                const authSuccess = await performAuth();
+                if (authSuccess) {
+                    response = await sendToggleRequest();
+                }
+            }
+
+            if (response.ok) {
+                const data = await response.json();
+                // Переключаем класс active в зависимости от ответа сервера
+                if (data.status === 'added') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+                
+                // Виброотклик
+                if (tg?.HapticFeedback) {
+                    tg.HapticFeedback.impactOccurred('light');
+                }
+            } else {
+                console.error("Could not toggle favorite. Status:", response.status);
+            }
+        });
+    });
+});
+
+/* === ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ (ГАЛЕРЕЯ И ТАБЫ) === */
+window.openFullGallery = function () {
+    const modal = document.getElementById('fullScreenGallery');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+};
+
+window.closeFullGallery = function () {
+    const modal = document.getElementById('fullScreenGallery');
+    if (modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+};
+
+function switchTab(event, tabId) {
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    event.currentTarget.classList.add('active');
+}
+
+// Селектор размеров
+document.querySelectorAll('.size-item:not(.disabled)').forEach(btn => {
+    btn.addEventListener('click', function () {
+        const selected = document.querySelector('.size-item.selected');
+        if (selected) selected.classList.remove('selected');
+        this.classList.add('selected');
+    });
+});
 </script>
 </body>
 </html>
