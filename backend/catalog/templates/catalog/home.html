@@ -122,12 +122,12 @@
                             <span class="badge-new">NEW</span>
                         {% endif %} -->
 
-                        <button class="wishlist-btn">
+                        <button class="wishlist-btn {% if product.id in favorite_ids %}active{% endif %}" 
+                                data-product-id="{{ product.id }}">
                             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                             </svg>
                         </button>
-
                         {# КАРТИНКИ #}
                         <div class="product-image-container">
                             {% for image in product.images.all %}
@@ -409,6 +409,76 @@
                 }
             });
         });
+
+        // Добавьте это внутри document.addEventListener('DOMContentLoaded', () => { ... })
+
+        const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+
+        wishlistBtns.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                // ОСТАНАВЛИВАЕМ ПЕРЕХОД ПО ССЫЛКЕ КАРТОЧКИ
+                e.stopPropagation();
+                e.preventDefault();
+
+                const productId = btn.dataset.productId;
+                const tg = window.Telegram?.WebApp;
+
+                // Используем FormData для отправки
+                const formData = new URLSearchParams();
+                formData.append('product_id', productId);
+
+                try {
+                    const response = await fetch('/favorite/toggle/', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData.toString()
+                    });
+
+                    if (response.status === 401) {
+                        // Если сессия слетела, можно вызвать авторизацию повторно
+                        console.error("Пользователь не авторизован");
+                        return;
+                    }
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        // Красим/разкрашиваем
+                        if (data.status === 'added') {
+                            btn.classList.add('active');
+                        } else {
+                            btn.classList.remove('active');
+                        }
+
+                        // Вибрация
+                        if (tg?.HapticFeedback) {
+                            tg.HapticFeedback.impactOccurred('light');
+                        }
+                    }
+                } catch (error) {
+                    console.error("Ошибка при работе с избранным:", error);
+                }
+            });
+        });
+
+        // Не забудьте функцию getCookie, если её нет в home.html
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
     });
 
     </script>

@@ -2598,3 +2598,15 @@ input:checked + .slider:before { transform: translateX(20px); }
     stroke: red;    /* красная обводка */
     transform: scale(1.2);
 }
+
+/* Цвет иконки при нажатии */
+.wishlist-btn.active svg {
+    fill: #ff4b4b; /* Красный цвет */
+    stroke: #ff4b4b;
+}
+
+/* Опционально: анимация увеличения при клике */
+.wishlist-btn:active svg {
+    transform: scale(1.2);
+    transition: transform 0.1s ease;
+}
