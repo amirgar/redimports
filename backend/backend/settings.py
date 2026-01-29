@@ -153,3 +153,5 @@ MEDIA_ROOT = os.environ.get('MEDIA_ROOT', '/data/media')
 
 # Укажи путь в формате 'имя_приложения.ИмяМодели'
 AUTH_USER_MODEL = 'telegram_auth.User'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
