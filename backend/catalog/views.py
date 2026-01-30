@@ -552,3 +552,70 @@ def favorites_list(request):
         'favorites_count': len(favorites),
     }
     return render(request, 'catalog/favorites.html', context)
+
+def cart_view(request):
+    cart_items = CartItem.objects.filter(user=request.user)
+    total_sum = sum(item.total_price for item in cart_items)
+    
+    # Пример логики скидок и доставки
+    delivery_cost = 1000 if total_sum > 0 else 0
+    discount = 10000 if total_sum > 20000 else 0
+    final_total = total_sum + delivery_cost - discount
+
+    context = {
+        'cart_items': cart_items,
+        'total_sum': total_sum,
+        'delivery_cost': delivery_cost,
+        'discount': discount,
+        'final_total': final_total,
+        'items_count': cart_items.count(),
+    }
+    return render(request, 'catalog/cart.html', context)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Product, Cart, CartItem
+
+@login_required
+def cart_detail(request):
+    # Получаем корзину пользователя или создаем новую, если её нет
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    return render(request, 'catalog/cart.html', {'cart': cart})
+
+@login_required
+def update_cart(request, item_id, action):
+    # Находим конкретный пункт в корзине
+    item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    
+    if action == 'plus':
+        item.quantity += 1
+    elif action == 'minus':
+        if item.quantity > 1:
+            item.quantity -= 1
+        else:
+            item.delete() # Удаляем, если количество стало 0
+            return redirect('cart_detail')
+    
+    item.save()
+    return redirect('cart_detail')
+
+@login_required
+def remove_from_cart(request, item_id):
+    item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    item.delete()
+    return redirect('cart_detail')
+
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_item, item_created = CartItem.objects.get_or_create(
+        cart=cart, 
+        product=product
+    )
+    
+    if not item_created:
+        cart_item.quantity += 1
+        cart_item.save()
+    return redirect('cart_detail')

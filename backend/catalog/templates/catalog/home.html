@@ -296,7 +296,11 @@
                     <a href="{% url 'profile' %}">
                         <img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
                     </a>
-                <div class="nav-item"><img src="{% static 'catalog/img/cart_icon.svg' %}" width="32"></div>
+                <div class="nav-item">
+                    <a href="{% url 'cart_detail' %}">
+                        <img src="{% static 'catalog/img/cart_icon.svg' %}" width="32">
+                    </a>
+                </div>
             </nav>
         </footer>
     </div>

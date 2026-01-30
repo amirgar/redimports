@@ -185,33 +185,33 @@ class Favorite(models.Model):
 
     def __str__(self):
         return f'{self.user} ❤️ {self.product}'
-    
+
+# Оставь одну версию этих моделей:
 class Cart(models.Model):
-    user = models.OneToOneField(
-        User,
-        on_delete=models.CASCADE,
-        related_name='cart'
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
+    # Добавим метод для общей суммы БЕЗ скидок
+    def total_base_price(self):
+        return sum(item.product.price * item.quantity for item in self.items.all())
+
+    # Общая сумма СО скидками
+    def total_final_price(self):
+        return sum(item.total_price() for item in self.items.all())
+
+    def total_discount(self):
+        """Разница между базовой ценой и итоговой (сумма скидки)"""
+        return self.total_base_price() - self.total_final_price()
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return f'Корзина {self.user}'
-    
 class CartItem(models.Model):
-    cart = models.ForeignKey(
-        Cart,
-        on_delete=models.CASCADE,
-        related_name='items'
-    )
-    product = models.ForeignKey(
-        'catalog.Product',
-        on_delete=models.CASCADE
-    )
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
+    # Поле для хранения выбранных параметров (размер, цвет)
+    selected_params = models.CharField(max_length=255, blank=True, null=True) 
 
-    class Meta:
-        unique_together = ('cart', 'product')
-
-    def __str__(self):
-        return f'{self.product} x {self.quantity}'
+    def total_price(self):
+        # Если есть discount_price, берем её, иначе обычную
+        price = self.product.discount_price if self.product.discount_price else self.product.price
+        return price * self.quantity

@@ -2629,3 +2629,120 @@ input:checked + .slider:before { transform: translateX(20px); }
     fill: #FF3B30 !important; /* Красная заливка */
     stroke: #FF3B30 !important; /* Красный контур */
 }
+
+.cart-container {
+    max-width: 400px; /* Мобильный вид как на фото */
+    margin: 0 auto;
+    font-family: 'Inter', sans-serif;
+    background: #f5f5f5;
+}
+
+.product-card {
+    display: flex;
+    background: white;
+    padding: 15px;
+    margin-bottom: 2px;
+}
+
+.product-card img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+    background: #ececec;
+    border-radius: 8px;
+}
+
+.product-info {
+    flex: 1;
+    padding-left: 15px;
+}
+
+.price {
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    background: #eee;
+    width: fit-content;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.qty-btn {
+    border: none;
+    background: none;
+    padding: 5px 12px;
+    cursor: pointer;
+}
+
+.summary-section {
+    background: white;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.checkout-btn {
+    width: 100%;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+    margin-top: 20px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 100px 20px;
+}
+
+.empty-state {
+    text-align: center;
+    padding-top: 100px;
+}
+
+.empty-state h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: #333;
+    letter-spacing: 1px;
+}
+
+.empty-state p {
+    font-size: 18px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.empty-state a {
+    color: #ff4d4d;
+    text-decoration: none;
+}
+
+.back-to-orders-btn {
+    position: fixed;
+    bottom: 80px; /* Над нижним меню */
+    left: 0;
+    right: 0;
+    background: #ff4d4d;
+    color: white !important;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    text-transform: lowercase;
+}
+
+.pink-text {
+    color: #ff8fa3; /* Цвет скидки как на фото */
+}
+
+/* Стили для карточек товара идентичны твоему первому скрину */

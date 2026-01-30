@@ -1,0 +1,128 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Red Imports Store - Корзина</title>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.2">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <br>
+    <br>
+    <br>
+    <div class="cart-page">
+        <header class="header">
+            <a href="javascript:history.back()" class="back-link">
+                <svg width="24" height="24" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                корзина
+            </a>
+            <button class="share-btn">📤</button>
+        </header>
+
+        {% if cart.items.exists %}
+            <div class="cart-content">
+                <div class="cart-actions">
+                    <span>🗑 {{ cart.items.count }}</span>
+                    <button class="select-all">выбрать все <span class="check-icon">✓</span></button>
+                </div>
+
+                {% for item in cart.items.all %}
+                <div class="product-card">
+                    <div class="img-wrapper">
+                        {% if item.product.images.exists %}
+                            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <img src="{% static 'catalog/img/no-image.png' %}" alt="No image">
+                        {% endif %}
+                    </div>
+                    <div class="info">
+                        <div class="price-line">
+                            <span class="current-price">
+                                {% if item.product.discount_price %}
+                                    {{ item.product.discount_price }} ₽
+                                {% else %}
+                                    {{ item.product.price }} ₽
+                                {% endif %}
+                            </span>
+                            <input type="checkbox" checked>
+                        </div>
+                        <p class="brand">{{ item.product.brand.name }}</p>
+                        <p class="name">{{ item.product.name }}</p>
+                        <p class="meta">{{ item.selected_params|default:"RUS 35 белый" }}</p>
+                        
+                        <div class="controls">
+                            <button class="minus js-update-cart" data-url="{% url 'update_cart' item.id 'minus' %}">−</button>
+                            <span class="qty" id="qty-{{ item.id }}">{{ item.quantity }}</span>
+                            <button class="plus js-update-cart" data-url="{% url 'update_cart' item.id 'plus' %}">+</button>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="total-block">
+                    <h3>сумма заказа</h3>
+                    <div class="row">
+                        <span>{{ cart.items.count }} товаров</span>
+                        <span>{{ cart.total_base_price }} ₽</span>
+                    </div>
+                    
+                    {% if cart.total_discount > 0 %}
+                    <div class="row pink-text">
+                        <span>скидка</span>
+                        <span>-{{ cart.total_discount }} ₽</span>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="row final">
+                        <strong>итого</strong>
+                        <strong>{{ cart.total_final_price }} ₽</strong>
+                    </div>
+                    
+                    <button class="submit-btn" onclick="location.href='#'">
+                        оформить <span>{{ cart.items.count }} = {{ cart.total_final_price }} ₽</span>
+                    </button>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="empty-state">
+                <h1 style="margin-top: 40px;">ТУТ ПОКА ПУСТО</h1>
+                <p>для выбора товаров<br>перейдите в <a href="{% url 'catalog' %}">каталог</a></p>
+                
+                <a href="{% url 'orders' %}" class="back-to-orders-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style="transform: rotate(180deg); margin-right: 8px;">
+                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
+                    </svg>
+                    к заказам
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</body>
+<script>
+const tg = window.Telegram.WebApp;
+tg.expand(); // Разворачиваем приложение на весь экран
+
+tg.setHeaderColor(tg.themeParams.bg_color || '#ffffff');
+document.querySelectorAll('.js-update-cart').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.preventDefault();
+        const url = this.getAttribute('data-url');
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            // После успешного обновления в БД просто перезагружаем часть страницы 
+            // или всю страницу для обновления итоговых сумм
+            location.reload(); 
+        });
+    });
+});
+</script>
+</html>
