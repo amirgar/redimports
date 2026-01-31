@@ -641,21 +641,26 @@ def cart_detail(request):
 # Также обнови update_cart и remove_from_cart, чтобы использовали get_tg_user
 def update_cart(request, item_id, action):
     user = get_tg_user(request)
-    if not user: return redirect('home') # Или ошибка
+    if not user:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
 
-    # Важно: фильтруем CartItem через cart__user=user, чтобы нельзя было менять чужую корзину
     item = get_object_or_404(CartItem, id=item_id, cart__user=user)
     
     if action == 'plus':
         item.quantity += 1
+        item.save()
     elif action == 'minus':
         if item.quantity > 1:
             item.quantity -= 1
+            item.save()
         else:
             item.delete()
-            return redirect('cart_detail')
     
-    item.save()
+    # Если это AJAX запрос (от нашего JS), возвращаем JSON
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'success'})
+    
+    # Если обычный переход по ссылке — редирект
     return redirect('cart_detail')
 
 def remove_from_cart(request, item_id):

@@ -312,9 +312,27 @@
         }, 300);
     }
 
-    function updateQty(id, action) {
-        // Здесь твоя логика обновления через fetch
-        location.reload();
+    function updateQty(itemId, action) {
+        // Формируем URL. Убедись, что в urls.py путь выглядит как /cart/update/<int:item_id>/<str:action>/
+        const url = `/cart/update/${itemId}/${action}/`;
+
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('light');
+
+        fetch(url, {
+            method: 'GET', // В твоем views.py это простая функция, можно использовать GET
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Перезагружаем страницу, чтобы обновились суммы и количество
+                location.reload();
+            } else {
+                console.error('Ошибка при обновлении количества');
+            }
+        })
+        .catch(err => console.error(err));
     }
 </script>
 
