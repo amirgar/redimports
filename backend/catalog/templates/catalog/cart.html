@@ -311,6 +311,52 @@
             cursor: pointer;
             z-index: 1;
         }
+
+        /* 1. Разрешаем странице скроллиться вертикально, даже если палец на карточке */
+        .product-cardd {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            background: #fff;
+            margin-bottom: 15px;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            width: 100%;
+            /* КЛЮЧЕВОЕ ИСПРАВЛЕНИЕ: pan-y позволяет скроллить страницу вверх-вниз */
+            touch-action: pan-y; 
+        }
+
+        /* 2. Убедимся, что html и body не блокируют скролл */
+        html, body {
+            height: auto;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto; /* Явно разрешаем вертикальный скролл */
+            -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+        }
+
+        /* 3. Контейнер страницы должен подстраиваться под контент */
+        .cart-page {
+            display: block;
+            height: auto;
+            min-height: 100vh;
+        }
+
+        /* 4. Исправление для card-main-content */
+        .card-main-content {
+            flex: 0 0 100%;
+            width: 100%;
+            background: #fff;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            gap: 15px;
+            scroll-snap-align: start;
+            position: relative;
+            z-index: 2;
+            /* Также добавляем здесь, чтобы нажатие на инфо не блокировало скролл */
+            touch-action: pan-y;
+        }
     </style>
 </head>
 <body>
