@@ -465,47 +465,59 @@ from .models import Product, ProductType, Brand
 
 
 def filters_view(request, category_id):
-    """Страница выбора фильтров"""
-    category = get_object_or_404(ProductType, id=category_id)
+    """Страница выбора фильтров для всей КАТЕГОРИИ"""
+    # 1. Исправляем 404: Ищем главную Категорию
+    category = get_object_or_404(Category, id=category_id)
     
-    # Берем ВСЕ товары категории для построения полного списка опций
-    base_qs = Product.objects.filter(product_type=category)
+    # 2. Находим все подтипы (ProductType) этой категории
+    product_types = ProductType.objects.filter(category=category)
     
-    # Сбор всех возможных вариантов (размеры, цвета и т.д.)
+    # 3. Берем ВСЕ товары, относящиеся к этим типам
+    base_qs = Product.objects.filter(product_type__in=product_types)
+    
+    # Сбор всех возможных вариантов из JSON (размеры, цвета и т.д.)
     filters_data = defaultdict(set)
     sizes_set = set()
 
     for product in base_qs:
         params = product.parameter_list or {}
         for k, v in params.items():
-            if k == 'sizes' and isinstance(v, list):
-                sizes_set.update(map(str, v))
-            elif isinstance(v, list):
-                filters_data[k].update(map(str, v))
+            # Если ключ 'sizes', выносим его в отдельный список (как в твоем шаблоне)
+            if k.lower() == 'sizes' or k.lower() == 'размер':
+                if isinstance(v, list):
+                    sizes_set.update(map(str, v))
+                else:
+                    sizes_set.add(str(v))
+            # Остальные параметры (цвет, материал и т.д.)
             else:
-                filters_data[k].add(str(v))
+                if isinstance(v, list):
+                    filters_data[k].update(map(str, v))
+                else:
+                    filters_data[k].add(str(v))
 
-    # Красивая сортировка размеров (числа как числа)
+    # Сортировка размеров
     sorted_sizes = sorted(
         list(sizes_set), 
         key=lambda x: int(x) if x.isdigit() else x
     )
 
-    # Статистика цен для плейсхолдеров
+    # Статистика цен для ползунков
     price_stats = base_qs.aggregate(min_p=Min('price'), max_p=Max('price'))
-    min_p_val = price_stats['min_p'] or 0
-    max_p_val = price_stats['max_p'] or 0
-
+    
     context = {
         "category": category,
+        # Превращаем сеты в отсортированные списки
         "filters": {k: sorted(list(v)) for k, v in filters_data.items()},
         "sizes": sorted_sizes,
-        "brands": Brand.objects.filter(products__in=base_qs).distinct(),
+        # Бренды именно этой категории
+        "brands": Brand.objects.filter(products__product_type__in=product_types).distinct(),
         
-        # Передаем текущие выбранные параметры, чтобы JS мог их подсветить
+        # Текущие значения из GET (чтобы фильтры не сбрасывались при открытии)
         "selected_brands": request.GET.getlist('brand'),
-        "min_price": price_stats['min_p'] or 0,
-        "max_price": price_stats['max_p'] or 0,
+        "min_price_val": price_stats['min_p'] or 0,
+        "max_price_val": price_stats['max_p'] or 0,
+        "current_min": request.GET.get('min_price') or price_stats['min_p'] or 0,
+        "current_max": request.GET.get('max_price') or price_stats['max_p'] or 0,
     }
 
     return render(request, "catalog/filter.html", context)
