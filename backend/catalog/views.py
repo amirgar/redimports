@@ -243,6 +243,7 @@ class OrderCreateView(APIView):
 from django.views.generic import TemplateView
 from .models import HeroBlock
 from .models import Category
+from .models import SiteSettings
 
 def home(request):
     categories = Category.objects.all()[:2]
@@ -260,6 +261,7 @@ def home(request):
     tg_id = request.session.get('telegram_id')
     if tg_id:
         favorite_ids = Favorite.objects.filter(user__telegram_id=tg_id).values_list('product_id', flat=True)
+    settings = SiteSettings.objects.first()
     
     return render(request, 'catalog/home.html', {
         'categories': categories,
@@ -272,6 +274,7 @@ def home(request):
         'all_products': all_products,
         'all_products_counter': all_products_counter,
         'hero': hero,
+        'settings': settings,
         'new_products': new_products,
         'all_products': all_products,
         'favorite_ids': favorite_ids, # Передаем список ID

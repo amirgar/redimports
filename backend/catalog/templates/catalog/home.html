@@ -90,10 +90,10 @@
 
                 <div class="categories-scroll">
                     {% for category in categories %}
-                    <div class="category-card">
+                    <a href="{% url 'category_detail' category.id %}" class="category-card" style="text-decoration: none; color: inherit; display: block;">
                         <span class="category-name">{{ category.name }}</span>
-                        <img src="{{ category.image.url }}" class="category-img" alt="куртки">
-                    </div>
+                        <img src="{{ category.image.url }}" class="category-img" alt="{{ category.name }}">
+                    </a>
                     {% endfor %}
                 </div>
             </div>
@@ -181,9 +181,6 @@
             <h2 class="categories-title">бренды</h2>
             <div class="brands-count">
                 <span>{{ brands_count }}</span>
-                <svg class="arrow-icon" viewBox="0 0 12 12" fill="none">
-                    <path d="M4.5 9L7.5 6L4.5 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
             </div>
         </div>
 
@@ -279,7 +276,10 @@
 <div class="bottom-spacer"></div>
         </main>
         <footer class="bottom-fixed-container">
-            <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
+            {% if site_settings and site_settings.is_active %}
+                <div class="promo-strip">{{ site_settings.promo_text }}</div>
+            {% endif %}
+            <!-- <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div> -->
             <nav class="nav-bar">
                 <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
                 <div class="nav-item">

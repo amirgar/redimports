@@ -219,3 +219,14 @@ class CartItem(models.Model):
         # Если есть discount_price, берем её, иначе обычную
         price = self.product.discount_price if self.product.discount_price else self.product.price
         return price * self.quantity
+    
+class SiteSettings(models.Model):
+    promo_text = models.CharField(max_length=255, verbose_name="Текст в промо-полоске", default="Скидка до -25% по промокоду WINTERMOVV")
+    is_active = models.BooleanField(default=True, verbose_name="Показывать полоску")
+
+    class Meta:
+        verbose_name = "Настройки сайта"
+        verbose_name_plural = "Настройки сайта"
+
+    def __clstr__(self):
+        return "Настройки сайта"

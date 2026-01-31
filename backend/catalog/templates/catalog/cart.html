@@ -129,20 +129,23 @@
         .pink-text { color: #FF3B30; }
 
         /* ФИКСИРОВАННАЯ КНОПКА */
+       /* ФИКСИРОВАННАЯ КНОПКА */
         .submit-btn {
             position: fixed; 
-            bottom: 0; 
+            /* Поднимаем кнопку над футером (85px высота футера + 40px полоска) */
+            bottom: 87px; 
             width: 100%; 
+            left: 0px;
             background: #FF3B30; 
             color: #fff;
             padding: 18px 20px; 
-            border: none; 
+            border: none;
             display: flex; 
             justify-content: space-between;
-            padding-bottom: calc(18px + env(safe-area-inset-bottom));
             font-weight: 600; 
             z-index: 100;
             font-size: 16px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
         }
 
         input[type="checkbox"] {
@@ -282,7 +285,6 @@
     </div>
 
     {% endif %}
-</div>
 <footer class="bottom-fixed-container">
     <nav class="nav-bar">
         <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
@@ -307,6 +309,7 @@
         </div>
     </nav>
 </footer>
+</div>
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();

@@ -67,7 +67,9 @@
 
 <div class="bottom-spacer"></div>
         <footer class="bottom-fixed-container">
-            <div class="promo-strip">Скидка до -25% по промокоду WINTERMOVV</div>
+            {% if site_settings and site_settings.is_active %}
+                <div class="promo-strip">{{ site_settings.promo_text }}</div>
+            {% endif %}
             <nav class="nav-bar">
                 <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
                 <div class="nav-item">

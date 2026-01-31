@@ -12,3 +12,9 @@ admin.site.register(ProductPhoto)
 class HeroBlockAdmin(admin.ModelAdmin):
     list_display = ('title', 'is_active')
     list_filter = ('is_active',)
+
+from .models import SiteSettings
+
+@admin.register(SiteSettings)
+class SiteSettingsAdmin(admin.ModelAdmin):
+    list_display = ('promo_text', 'is_active')
