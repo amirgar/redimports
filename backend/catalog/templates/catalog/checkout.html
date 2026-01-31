@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.1">
     <style>
-        @font-face { font-family: 'TT Firs Neue'; src: url('{% static "catalog/fonts/TTFirsNeue-Regular.ttf" %}') format('opentype'); }
+        @font-face { font-family: 'T2-Reg'; src: url('{% static "catalog/fonts/TTFirsNeue-Regular.ttf" %}') format('opentype'); }
         @font-face { font-family: 'SF Pro'; src: url('{% static "catalog/fonts/SFProDisplay-Regular.ttf" %}') format('opentype'); }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -84,8 +85,13 @@
 
         /* SUCCESS STATE */
         .success-page {
-            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            text-align: center; padding: 0 34px;
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: flex-start; /* Изменено с center на flex-start */
+            text-align: center; 
+            padding: 20vh 34px 0; /* Добавлен отступ сверху в 20% высоты экрана */
         }
         .success-page img { width: 200px; height: 200px; margin-bottom: 24px; }
         .success-page p { font-size: 16px; color: #323232; opacity: 0.7; margin-top: 12px; }
@@ -100,7 +106,7 @@
             <button class="back-btn" onclick="prevStep()">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
             </button>
-            <div class="page-title">оформление заказа</div>
+            <div class="page-title" style="font-family: T2-Reg;">оформление заказа</div>
         </div>
         <div class="progress-bar-wrap">
             <div class="progress-bar-fill" id="progressBar"></div>
@@ -109,78 +115,92 @@
 
     <div id="step1" class="step-container active">
         <div class="content-padding">
-            <h2>кто заберет заказ?</h2>
+            <h2 style="font-family: T2-Reg;">кто заберет заказ?</h2>
             <div class="input-group">
-                <div class="field"><input type="text" id="fname" placeholder="имя*"></div>
-                <div class="field"><input type="text" id="lname" placeholder="фамилия*"></div>
-                <div class="field"><input type="text" id="mname" placeholder="отчество"></div>
-                <div class="field"><input type="tel" id="phone" placeholder="телефон*"></div>
-                <div class="field" onclick="selectDate()">
-                    <input type="text" id="deliveryDate" placeholder="дата доставки" readonly>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                </div>
+                <div class="field"><input style="font-family: T2-Reg;" type="text" id="fname" placeholder="имя"></div>
+                <div class="field"><input style="font-family: T2-Reg;" type="text" id="lname" placeholder="фамилия"></div>
+                <div class="field"><input style="font-family: T2-Reg;" type="text" id="mname" placeholder="отчество"></div>
+                <div class="field"><input style="font-family: T2-Reg;" type="tel" id="phone" placeholder="телефон"></div>
             </div>
         </div>
-        <button class="footer-btn" onclick="nextStep(2)">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        <button class="footer-btn" onclick="nextStep(2)" style="font-family: T2-Reg;">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
     </div>
 
     <div id="step2" class="step-container">
         <div class="content-padding">
-            <h2>ваш адрес</h2>
+            <h2 style="font-family: T2-Reg;">ваш адрес</h2>
             <div class="input-group" style="margin-bottom: 32px;">
-                <div class="field"><input type="text" id="city" placeholder="населенный пункт"></div>
+                <div class="field"><input style="font-family: T2-Reg;" type="text" id="city" placeholder="адрес"></div>
             </div>
 
-            <h2>способ доставки</h2>
+            <h2 style="font-family: T2-Reg;">способ доставки</h2>
             <div class="radio-group">
                 <div class="radio-item selected" onclick="selectRadio(this, 'pickup')">
-                    <span>самовывоз</span>
+                    <span style="font-family: T2-Reg;">самовывоз</span>
                     <div class="dot"></div>
                 </div>
                 <div class="radio-item" onclick="selectRadio(this, 'pvz')">
-                    <span>пункт выдачи</span>
+                    <span style="font-family: T2-Reg;">пункт выдачи</span>
                     <div class="dot"></div>
                 </div>
             </div>
         </div>
-        <button class="footer-btn" onclick="nextStep(3)">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+        <button class="footer-btn" style="font-family: T2-Reg;" onclick="nextStep(3)">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
     </div>
 
     <div id="step3" class="step-container">
         <div class="content-padding">
             <div style="background:#fff; border-radius: 20px; padding: 24px; margin-top: 20px;">
-                <h3 style="margin:0 0 20px; font-size: 24px; font-family: 'TT Firs Neue';">сумма заказа</h3>
+                <h3 style="margin:0 0 20px; font-size: 24px; font-family: 'T2-Reg';">сумма заказа</h3>
                 <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
-                    <span>{{ cart.items.count }} товаров</span>
-                    <span>{{ cart.total_final_price }} ₽</span>
+                    <span style="font-family: T2-Reg;">{{ cart.items.count }} товаров</span>
+                    <span style="font-family: T2-Reg;">{{ cart.total_base_price }} ₽</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; color: #FF4145; margin-bottom:20px;">
-                    <span>скидка</span>
-                    <span>-0 ₽</span>
+                    <span style="font-family: T2-Reg;">скидка</span>
+                    <span style="font-family: T2-Reg;">-{{ cart.total_discount }} ₽</span>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size: 24px; font-weight:bold; border-top: 1px solid #eee; padding-top:20px;">
-                    <span>итого</span>
-                    <span>{{ cart.total_final_price }} ₽</span>
+                    <span style="font-family: T2-Reg;">итого</span>
+                    <span style="font-family: T2-Reg;">{{ cart.total_final_price }} ₽</span>
                 </div>
             </div>
         </div>
-        <button class="footer-btn" onclick="finishOrder()">подтвердить</button>
+        <button style="font-family: T2-Reg;" class="footer-btn" onclick="finishOrder()">подтвердить</button>
     </div>
 
     <div id="stepSuccess" class="step-container">
         <div class="success-page">
             <img src="{% static 'catalog/img/duck_cool.png' %}" alt="Успех">
-            <h2>спасибо за доверие!</h2>
-            <p>Мы пришлем вам всю инфу в ближайшее время</p>
+            <h2 style="font-family: T2-Reg;">спасибо за доверие!</h2>
+            <p style="font-family: T2-Reg;">Мы пришлем вам всю инфу в ближайшее время</p>
         </div>
-        <div class="final-menu">
-            <a href="{% url 'home' %}" style="text-decoration:none; color:#323232;">🏠</a>
-            <a href="{% url 'catalog' %}" style="text-decoration:none; color:#323232;">🔍</a>
-            <div style="width:40px; height:40px; background:#FF4145; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff;">→</div>
-            <a href="{% url 'profile' %}" style="text-decoration:none; color:#323232;">👤</a>
-            <a href="{% url 'cart_detail' %}" style="text-decoration:none; color:#323232;">🛍️</a>
-        </div>
+        <footer class="bottom-fixed-container">
+            <nav class="nav-bar">
+                <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
+                <div class="nav-item">
+                    <a href="{% url 'favorites_list' %}">
+                        <img src="{% static 'catalog/img/heart_icon.svg' %}" width="32">
+                    </a>
+                </div>
+                <div class="nav-item logo-box">
+                    <a href="{% url 'home' %}">
+                        <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+                    </a>
+                </div>
+                <div class="nav-item">
+                    <a href="{% url 'profile' %}">
+                        <img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+                    </a>
+                <div class="nav-item">
+                    <a href="{% url 'cart_detail' %}">
+                        <img src="{% static 'catalog/img/cart_icon.svg' %}" width="32">
+                    </a>
+                </div>
+            </nav>
+        </footer>
     </div>
+    
 
     <script>
     const tg = window.Telegram.WebApp;

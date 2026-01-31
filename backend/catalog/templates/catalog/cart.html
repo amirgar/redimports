@@ -48,6 +48,25 @@
             touch-action: pan-y; /* Разрешает вертикальный скролл */
         }
 
+        .bottom-fixed-container {
+            position: fixed; bottom: 0; width: 100%; background: #fff; z-index: 2000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            padding-bottom: env(safe-area-inset-bottom, 20px);
+        }
+        .promo-strip {
+            background: #FF3B30; color: #fff; height: 40px;
+            display: flex; justify-content: center; align-items: center;
+            font-family: 'SF Pro Text'; font-size: 14px; letter-spacing: -0.01em;
+        }
+        .nav-bar { display: flex; justify-content: space-around; align-items: center; height: 85px; }
+        .nav-item { flex: 1; display: flex; justify-content: center; position: relative; }
+        .cart-badge {
+            position: absolute; top: -5px; right: 20%; background: #FF3B30;
+            color: #fff; font-size: 10px; width: 18px; height: 18px;
+            border-radius: 50%; display: flex; justify-content: center; align-items: center;
+            border: 2px solid #fff; font-weight: bold;
+        }
+
         /* КНОПКА УДАЛЕНИЯ */
         .delete-btn {
             position: absolute;
@@ -247,11 +266,9 @@
         <div class="row final"><strong>итого</strong><strong>{{ cart.total_final_price }} ₽</strong></div>
     </div>
 
-    <button class="submit-btn" onclick="tg.MainButton.show();">
-        <a href="{% url 'checkout' %}" style="text-decoration: none;">
-            <span>оформить</span>
-            <span>{{ cart.total_final_price }} ₽</span>
-        </a>
+    <button class="submit-btn" onclick="window.location.href='{% url 'checkout' %}';">
+        <span>оформить</span>
+        <span>{{ cart.total_final_price }} ₽</span>
     </button>
     {% else %}
 
@@ -266,6 +283,30 @@
 
     {% endif %}
 </div>
+<footer class="bottom-fixed-container">
+    <nav class="nav-bar">
+        <div class="nav-item"><a href="{% url 'catalog' %}"><img src="{% static 'catalog/img/menu_icon.svg' %}" width="32"></a></div>
+        <div class="nav-item">
+            <a href="{% url 'favorites_list' %}">
+                <img src="{% static 'catalog/img/heart_icon.svg' %}" width="32">
+            </a>
+        </div>
+        <div class="nav-item logo-box">
+            <a href="{% url 'home' %}">
+                <img src="{% static 'catalog/img/logo_red.svg' %}" width="28">
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="{% url 'profile' %}">
+                <img src="{% static 'catalog/img/profile_icon.svg' %}" width="32"></div>
+            </a>
+        <div class="nav-item">
+            <a href="{% url 'cart_detail' %}">
+                <img src="{% static 'catalog/img/cart_icon.svg' %}" width="32">
+            </a>
+        </div>
+    </nav>
+</footer>
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
