@@ -248,8 +248,10 @@
     </div>
 
     <button class="submit-btn" onclick="tg.MainButton.show();">
-        <span>оформить</span>
-        <span>{{ cart.total_final_price }} ₽</span>
+        <a href="{% url 'checkout' %}" style="text-decoration: none;">
+            <span>оформить</span>
+            <span>{{ cart.total_final_price }} ₽</span>
+        </a>
     </button>
     {% else %}
 

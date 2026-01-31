@@ -670,3 +670,66 @@ def remove_from_cart(request, item_id):
     item = get_object_or_404(CartItem, id=item_id, cart__user=user)
     item.delete()
     return redirect('cart_detail')
+
+def checkout_view(request):
+    cart = get_object_or_404(Cart, user=get_tg_user(request))
+    return render(request, 'catalog/checkout.html', {'cart': cart})
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status
+from orders.models import Order, OrderItem, Payment
+from catalog.models import Cart, CartItem 
+
+
+class OrderCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        # 1. Получаем корзину пользователя
+        try:
+            cart = Cart.objects.get(user=user)
+        except Cart.DoesNotExist:
+            return Response({"error": "Cart not found"}, status=404)
+
+        if not cart.items.exists():
+            return Response({"error": "Cart is empty"}, status=400)
+
+        data = request.data
+
+        # 2. Создаем объект Order (по твоей модели)
+        order = Order.objects.create(
+            user=user,
+            first_name=data.get('first_name'),
+            last_name=data.get('last_name'),
+            middle_name=data.get('middle_name', ''),
+            phone=data.get('phone'),
+            address=data.get('address'),
+            delivery_method=data.get('delivery_method', 'pickup'),
+            payment_method=data.get('payment_method', 'card'),
+            total_price=cart.total_final_price() # Убедись, что метод так называется в Cart
+        )
+
+        # 3. Переносим товары из корзины в OrderItem
+        for item in cart.items.all():
+            OrderItem.objects.create(
+                order=order,
+                product=item.product,
+                price=item.product.discount_price or item.product.price,
+                quantity=item.quantity
+            )
+
+        # 4. Создаем запись о платеже (как в твоей модели Payment)
+        Payment.objects.create(
+            order=order,
+            provider=order.payment_method,
+            amount=order.total_price,
+            status='pending'
+        )
+
+        # 5. Очищаем корзину после успешного заказа
+        cart.items.all().delete()
+
+        return Response({"status": "success", "order_id": order.id}, status=201)

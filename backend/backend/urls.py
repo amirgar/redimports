@@ -3,7 +3,8 @@ from django.urls import path, include
 from catalog.views import (
     home, catalog, search_results, product_card, product_detail, 
     category_details, filters_view, profile, 
-    toggle_favorite, favorites_list, cart_detail, update_cart, remove_from_cart,  add_to_cart
+    toggle_favorite, favorites_list, cart_detail, update_cart, remove_from_cart,  add_to_cart, 
+    checkout_view, OrderCreateView
 )
 from telegram_auth.views import telegram_auth
 from django.conf.urls.static import static
@@ -14,8 +15,8 @@ urlpatterns = [
     
     # Исправляем путь API авторизации (чтобы совпадало с JS)
     path('api/telegram/auth/', telegram_auth, name='telegram_auth'), 
-    
-    # Добавляем путь для избранного (которого не хватало)
+    path('api/order/create/', OrderCreateView.as_view(), name='order_create_api'),
+    path('checkout/', checkout_view, name='checkout'),
     path('favorite/toggle/', toggle_favorite, name='toggle_favorite'),
     path('cart/', cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', add_to_cart, name='add_to_cart'),

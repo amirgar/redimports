@@ -1,0 +1,264 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        @font-face { font-family: 'TT Firs Neue'; src: url('{% static "catalog/fonts/TTFirsNeue-Regular.ttf" %}') format('opentype'); }
+        @font-face { font-family: 'SF Pro'; src: url('{% static "catalog/fonts/SFProDisplay-Regular.ttf" %}') format('opentype'); }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        body {
+            background: #F2F2F2;
+            margin: 0;
+            font-family: 'SF Pro', sans-serif;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .step-container {
+            display: none; /* Скрыты по умолчанию */
+            padding-top: 106px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .step-container.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+
+        /* HEADER */
+        .header {
+            position: fixed;
+            top: 0; width: 100%; height: 106px;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(24px);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .top-bar { padding: 50px 16px 12px; display: flex; align-items: center; gap: 10px; }
+        .back-btn { width: 26px; height: 26px; border: none; background: none; cursor: pointer; }
+        .page-title { font-size: 20px; color: #323232; font-weight: 400; }
+
+        .progress-bar-wrap { width: 100%; height: 3px; background: rgba(50, 50, 50, 0.1); }
+        .progress-bar-fill { height: 100%; background: #FF4145; transition: width 0.3s ease; width: 33%; }
+
+        /* CONTENT */
+        .content-padding { padding: 12px 16px; }
+        h2 { font-family: 'TT Firs Neue'; font-size: 32px; line-height: 36px; letter-spacing: -0.03em; margin: 0 0 24px 0; color: #323232; font-weight: 400; }
+
+        .input-group { display: flex; flex-direction: column; gap: 0; background: #fff; border-radius: 12px; overflow: hidden; }
+        .field {
+            padding: 14px 16px;
+            border-bottom: 1px solid #F2F2F2;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .field:last-child { border-bottom: none; }
+        .field input {
+            border: none; outline: none; width: 100%; font-size: 18px; color: #323232;
+            font-family: 'SF Pro';
+        }
+        .field input::placeholder { color: rgba(50, 50, 50, 0.4); }
+
+        /* РАДИО-КНОПКИ (Способ доставки) */
+        .radio-item { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.5); }
+        .radio-item span { font-size: 20px; color: #323232; }
+        .dot { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #323232; display: flex; align-items: center; justify-content: center; }
+        .radio-item.selected .dot::after { content: ''; width: 10px; height: 10px; background: #323232; border-radius: 50%; }
+
+        /* FOOTER BUTTON */
+        .footer-btn {
+            position: fixed; bottom: 0; width: 100%;
+            height: 70px; background: #FF4145;
+            display: flex; justify-content: center; align-items: center;
+            color: #fff; font-size: 18px; border: none; cursor: pointer;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .footer-btn span { margin-right: 8px; }
+
+        /* SUCCESS STATE */
+        .success-page {
+            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            text-align: center; padding: 0 34px;
+        }
+        .success-page img { width: 200px; height: 200px; margin-bottom: 24px; }
+        .success-page p { font-size: 16px; color: #323232; opacity: 0.7; margin-top: 12px; }
+
+        .final-menu { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 16px 0 34px; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+
+    <div class="header" id="mainHeader">
+        <div class="top-bar">
+            <button class="back-btn" onclick="prevStep()">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="page-title">оформление заказа</div>
+        </div>
+        <div class="progress-bar-wrap">
+            <div class="progress-bar-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <div id="step1" class="step-container active">
+        <div class="content-padding">
+            <h2>кто заберет заказ?</h2>
+            <div class="input-group">
+                <div class="field"><input type="text" id="fname" placeholder="имя*"></div>
+                <div class="field"><input type="text" id="lname" placeholder="фамилия*"></div>
+                <div class="field"><input type="text" id="mname" placeholder="отчество"></div>
+                <div class="field"><input type="tel" id="phone" placeholder="телефон*"></div>
+                <div class="field" onclick="selectDate()">
+                    <input type="text" id="deliveryDate" placeholder="дата доставки" readonly>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#323232" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </div>
+            </div>
+        </div>
+        <button class="footer-btn" onclick="nextStep(2)">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    </div>
+
+    <div id="step2" class="step-container">
+        <div class="content-padding">
+            <h2>ваш адрес</h2>
+            <div class="input-group" style="margin-bottom: 32px;">
+                <div class="field"><input type="text" id="city" placeholder="населенный пункт"></div>
+            </div>
+
+            <h2>способ доставки</h2>
+            <div class="radio-group">
+                <div class="radio-item selected" onclick="selectRadio(this, 'pickup')">
+                    <span>самовывоз</span>
+                    <div class="dot"></div>
+                </div>
+                <div class="radio-item" onclick="selectRadio(this, 'pvz')">
+                    <span>пункт выдачи</span>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        </div>
+        <button class="footer-btn" onclick="nextStep(3)">продолжить <svg style="margin-left:10px" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+    </div>
+
+    <div id="step3" class="step-container">
+        <div class="content-padding">
+            <div style="background:#fff; border-radius: 20px; padding: 24px; margin-top: 20px;">
+                <h3 style="margin:0 0 20px; font-size: 24px; font-family: 'TT Firs Neue';">сумма заказа</h3>
+                <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+                    <span>{{ cart.items.count }} товаров</span>
+                    <span>{{ cart.total_final_price }} ₽</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; color: #FF4145; margin-bottom:20px;">
+                    <span>скидка</span>
+                    <span>-0 ₽</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size: 24px; font-weight:bold; border-top: 1px solid #eee; padding-top:20px;">
+                    <span>итого</span>
+                    <span>{{ cart.total_final_price }} ₽</span>
+                </div>
+            </div>
+        </div>
+        <button class="footer-btn" onclick="finishOrder()">подтвердить</button>
+    </div>
+
+    <div id="stepSuccess" class="step-container">
+        <div class="success-page">
+            <img src="{% static 'catalog/img/duck_cool.png' %}" alt="Успех">
+            <h2>спасибо за доверие!</h2>
+            <p>Мы пришлем вам всю инфу в ближайшее время</p>
+        </div>
+        <div class="final-menu">
+            <a href="{% url 'home' %}" style="text-decoration:none; color:#323232;">🏠</a>
+            <a href="{% url 'catalog' %}" style="text-decoration:none; color:#323232;">🔍</a>
+            <div style="width:40px; height:40px; background:#FF4145; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff;">→</div>
+            <a href="{% url 'profile' %}" style="text-decoration:none; color:#323232;">👤</a>
+            <a href="{% url 'cart_detail' %}" style="text-decoration:none; color:#323232;">🛍️</a>
+        </div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        let currentStep = 1;
+
+        function nextStep(step) {
+            // Валидация (минимум)
+            if (step === 2 && document.getElementById('phone').value === "") {
+                tg.showAlert("Пожалуйста, заполните телефон");
+                return;
+            }
+
+            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+            
+            if (step === 2) {
+                document.getElementById('step2').classList.add('active');
+                document.getElementById('progressBar').style.width = '66%';
+            } else if (step === 3) {
+                document.getElementById('step3').classList.add('active');
+                document.getElementById('progressBar').style.width = '100%';
+            }
+            currentStep = step;
+            window.scrollTo(0,0);
+        }
+
+        function prevStep() {
+            if (currentStep === 1) {
+                window.history.back();
+                return;
+            }
+            nextStep(currentStep - 1);
+        }
+
+        function selectRadio(el, val) {
+            document.querySelectorAll('.radio-item').forEach(item => item.classList.remove('selected'));
+            el.classList.add('selected');
+        }
+
+        function finishOrder() {
+            // Собираем данные из полей ввода
+            const orderData = {
+                first_name: document.getElementById('fname').value,
+                last_name: document.getElementById('lname').value,
+                middle_name: document.getElementById('mname').value,
+                phone: document.getElementById('phone').value,
+                address: document.getElementById('city').value,
+                delivery_method: document.querySelector('.radio-item.selected span').innerText === 'самовывоз' ? 'pickup' : 'point', // Соответствует DELIVERY_CHOICES
+                payment_method: 'card', // Или добавь выбор на 3-м шаге
+            };
+
+            // Отправляем на сервер
+            fetch('/api/order/create/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken'), // Не забудь функцию получения куки
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    tg.HapticFeedback.notificationOccurred('success');
+                    // Показываем утку только при успешном ответе сервера
+                    document.getElementById('mainHeader').style.display = 'none';
+                    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+                    document.getElementById('stepSuccess').classList.add('active');
+                } else {
+                    tg.showAlert("Ошибка при сохранении заказа");
+                }
+            });
+        }
+
+        function selectDate() {
+            // Имитация выбора даты
+            document.getElementById('deliveryDate').value = "завтра, 12 октября";
+        }
+
+        tg.expand();
+    </script>
+</body>
+</html>
