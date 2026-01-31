@@ -5,8 +5,313 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Red Imports Store - Корзина</title>
-    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.2">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.2">
+
+    <style>
+        /* --- ОБЩИЕ СТИЛИ КОРЗИНЫ --- */
+        body {
+            background-color: #F9F9F9; /* Светло-серый фон как на скрине */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding-bottom: 100px; /* Отступ под нижнюю кнопку */
+        }
+
+        .header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header .back-link {
+            text-decoration: none;
+            color: #000;
+            font-size: 18px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* --- СТИЛИ ПУСТОЙ КОРЗИНЫ (Empty State) --- */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70vh; /* Почти на весь экран */
+            text-align: center;
+        }
+
+        .empty-state h1 {
+            font-size: 22px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #000;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #888;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .empty-state a {
+            color: #FF3B30; /* Красный цвет */
+            text-decoration: none;
+        }
+
+        /* Нижняя красная кнопка "К заказам" */
+        .bottom-red-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #FF3B30;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom)); /* Для iPhone без кнопки */
+        }
+
+        /* --- СТИЛИ ЗАПОЛНЕННОЙ КОРЗИНЫ --- */
+        .cart-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 20px;
+            color: #888;
+            font-size: 14px;
+        }
+        .select-all {
+            background: none;
+            border: none;
+            color: #000;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* --- КАРТОЧКА СВАЙПА (Магия здесь) --- */
+        .product-cardd {
+            /* Это контейнер-слайдер */
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            background: #fff;
+            margin-bottom: 15px; /* Отступ между товарами */
+            /* Скрываем скроллбар */
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+        }
+        .product-cardd::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Видимая часть карточки */
+        .card-main-content {
+            min-width: 100%; /* Занимает весь экран */
+            background: #fff;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            gap: 15px;
+            scroll-snap-align: start; /* Прилипает к началу */
+            position: relative;
+        }
+
+        /* Красная кнопка удаления (справа за экраном) */
+        .delete-action-btn {
+            min-width: 80px; /* Ширина красной полосы */
+            background-color: #FF3B30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: end; /* Прилипает к концу при свайпе */
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Внутри карточки */
+        .img-wrapper {
+            width: 90px;
+            height: 90px;
+            background-color: #F2F2F2;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .img-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply; /* Убирает белый фон у картинки если он есть */
+        }
+
+        .info {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .top-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .price {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .checkbox-custom {
+            width: 20px;
+            height: 20px;
+            accent-color: #000; /* Черная галочка */
+        }
+
+        .brand {
+            font-size: 12px;
+            color: #888;
+            margin: 2px 0;
+            text-transform: uppercase;
+        }
+        .name {
+            font-size: 14px;
+            color: #000;
+            margin: 0;
+            line-height: 1.2;
+            max-width: 180px;
+        }
+        .meta {
+            font-size: 12px;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Контроллы количества (+ 1 -) */
+        .controls {
+            display: flex;
+            align-items: center;
+            background: #F2F2F2; /* Серый фон переключателя */
+            border-radius: 6px;
+            width: fit-content;
+            margin-top: 8px;
+            padding: 2px;
+        }
+        .controls button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            width: 30px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        .controls span {
+            font-size: 14px;
+            font-weight: 500;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* --- ИТОГИ --- */
+        .total-block {
+            background: #fff;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .total-block h3 {
+            font-size: 18px;
+            margin: 0 0 15px 0;
+        }
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #333;
+        }
+        .row.final {
+            margin-top: 15px;
+            font-size: 18px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        .pink-text { color: #FF3B30; }
+
+        .submit-btn {
+            background-color: #FF3B30;
+            color: white;
+            width: 100%;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 0; /* Прямоугольная кнопка */
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            display: flex;
+            justify-content: space-between;
+            padding-left: 20px;
+            padding-right: 20px;
+            padding-bottom: calc(15px + env(safe-area-inset-bottom));
+        }
+
+        /* Внеси эти изменения в свой блок <style> */
+
+        .product-cardd {
+            display: flex;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            background: #fff;
+            margin-bottom: 15px;
+            scrollbar-width: none; 
+            -ms-overflow-style: none;
+            width: 100%; /* Гарантируем ширину контейнера */
+        }
+
+        .card-main-content {
+            /* Заменяем min-width на flex: 0 0 100% */
+            flex: 0 0 100%; 
+            width: 100%;
+            background: #fff;
+            padding: 15px;
+            box-sizing: border-box;
+            display: flex;
+            gap: 15px;
+            scroll-snap-align: start;
+            position: relative;
+            z-index: 2; /* Чтобы контент был выше кнопки, если они наложатся */
+        }
+
+        .delete-action-btn {
+            flex: 0 0 80px; /* Фиксированная ширина кнопки удаления */
+            background-color: #FF3B30;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            scroll-snap-align: end;
+            border: none;
+            cursor: pointer;
+            z-index: 1;
+        }
+    </style>
 </head>
 <body>
     <br>
@@ -15,59 +320,86 @@
     <div class="cart-page">
         <header class="header">
             <a href="javascript:history.back()" class="back-link">
-                <svg width="24" height="24" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
                 корзина
             </a>
-            <button class="share-btn">📤</button>
         </header>
 
         {% if cart.items.exists %}
-            <div class="cart-content">
+            <div class="cart-content" style="padding-bottom: 80px;">
                 <div class="cart-actions">
-                    <span>🗑 {{ cart.items.count }}</span>
-                    <button class="select-all">выбрать все <span class="check-icon">✓</span></button>
+                    <div style="display:flex; align-items:center; gap:5px;">
+                        <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> -->
+                        Количество товаров: {{ cart.items.count }}
+                    </div>
                 </div>
 
                 {% for item in cart.items.all %}
-                <div class="product-cardd">
-                    <div class="img-wrapper">
-                        {% if item.product.images.exists %}
-                            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
-                        {% else %}
-                            <img src="{% static 'catalog/img/no-image.png' %}" alt="No image">
-                        {% endif %}
-                    </div>
-                    <div class="info">
-                        <div class="price-line">
-                            <span class="current-price">
-                                {% if item.product.discount_price %}
-                                    {{ item.product.discount_price }} ₽
-                                {% else %}
-                                    {{ item.product.price }} ₽
-                                {% endif %}
-                            </span>
-                            <input type="checkbox" checked>
+                <div class="product-cardd" id="card-{{ item.id }}">
+                    
+                    <div class="card-main-content">
+                        <div class="img-wrapper">
+                            {% if item.product.images.exists %}
+                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                            {% else %}
+                                <img src="{% static 'catalog/img/no-image.png' %}" alt="No image">
+                            {% endif %}
                         </div>
-                        <p class="brand">{{ item.product.brand.name }}</p>
-                        <p class="name">{{ item.product.name }}</p>
-                        <p class="meta">{{ item.selected_params|default:"RUS 35 белый" }}</p>
                         
-                        <div class="controls">
-                            <button class="minus js-update-cart" data-url="{% url 'update_cart' item.id 'minus' %}">−</button>
-                            <span class="qty" id="qty-{{ item.id }}">{{ item.quantity }}</span>
-                            <button class="plus js-update-cart" data-url="{% url 'update_cart' item.id 'plus' %}">+</button>
+                        <div class="info">
+                            <div class="top-row">
+                                <span class="price" style="font-family: T2-Reg;">
+                                    {% if item.product.discount_price %}
+                                        {{ item.product.discount_price }} ₽
+                                    {% else %}
+                                        {{ item.product.price }} ₽
+                                    {% endif %}
+                                </span>
+                                <input type="checkbox" class="checkbox-custom" checked>
+                            </div>
+                            
+                            <div class="details">
+                                <p class="brand" style="font-family: T2-Reg;">{{ item.product.brand.name }}</p>
+                                <p class="name" style="font-family: T2-Reg;">{{ item.product.name }}</p>
+                                <p class="meta" style="font-family: T2-Reg;">{{ item.selected_params|default:"RUS 35 белый" }}</p>
+                            </div>
+
+                            <div class="controls">
+                                <button class="minus js-update-cart" data-url="{% url 'update_cart' item.id 'minus' %}">−</button>
+                                <span class="qty" id="qty-{{ item.id }}" style="font-family: T2-Reg;">{{ item.quantity }}</span>
+                                <button class="plus js-update-cart" data-url="{% url 'update_cart' item.id 'plus' %}">+</button>
+                            </div>
                         </div>
                     </div>
+
+                    <button class="delete-action-btn js-remove-cart" data-url="{% url 'remove_from_cart' item.id %}" onclick="removeItem(this, '{{ item.id }}')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"></polyline>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                        </svg>
+                    </button>
                 </div>
                 {% endfor %}
 
                 <div class="total-block">
-                    <h3>сумма заказа</h3>
-                    <div class="row">
+                    <!-- <div style="border-bottom: 1px solid #eee; padding-bottom: 15px; margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
+                        <span style="font-size:16px;">wintermovv</span>
+                        <span style="color:#2ecc71;">✓</span>
+                    </div> -->
+
+                    <h3 style="font-family: T2-Reg;">сумма заказа</h3>
+                    <div class="row" style="font-family: T2-Reg;">
                         <span>{{ cart.items.count }} товаров</span>
                         <span>{{ cart.total_base_price }} ₽</span>
                     </div>
                     
+                    <div class="row" style="font-family: T2-Reg;">
+                        <span>доставка</span>
+                        <span>1 000 ₽</span>
+                    </div>
+
                     {% if cart.total_discount > 0 %}
                     <div class="row pink-text">
                         <span>скидка</span>
@@ -75,37 +407,38 @@
                     </div>
                     {% endif %}
                     
-                    <div class="row final">
-                        <strong>итого</strong>
-                        <strong>{{ cart.total_final_price }} ₽</strong>
+                    <div class="row pink-text" style="font-family: T2-Reg;">
+                         <span>Скидка <span style="font-size:10px;"></span></span>
+                         <span>-10 000 ₽</span>
                     </div>
-                    
-                    <button class="submit-btn" onclick="location.href='#'">
-                        оформить <span>{{ cart.items.count }} = {{ cart.total_final_price }} ₽</span>
-                    </button>
+
+                    <div class="row final" >
+                        <strong style="font-family: T2-Reg;">итого</strong>
+                        <strong style="font-family: T2-Reg;">{{ cart.total_final_price }} ₽</strong>
+                    </div>
                 </div>
             </div>
 
+            <button class="submit-btn" onclick="location.href='#'">
+                <span style="font-family: T2-Reg;">оформить</span>
+                <span style="font-family: T2-Reg;">{{ cart.total_final_price }} ₽</span>
+            </button>
+
         {% else %}
             <div class="empty-state">
-                <h1 style="margin-top: 40px;">ТУТ ПОКА ПУСТО</h1>
+                <h1>ТУТ ПОКА ПУСТО</h1>
                 <p>для выбора товаров<br>перейдите в <a href="{% url 'catalog' %}">каталог</a></p>
                 
-                <a href="{% url 'orders' %}" class="back-to-orders-btn">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white" style="transform: rotate(180deg); margin-right: 8px;">
-                        <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/>
-                    </svg>
-                    к заказам
-                </a>
             </div>
         {% endif %}
     </div>
-</body>
+
 <script>
 const tg = window.Telegram.WebApp;
-tg.expand(); // Разворачиваем приложение на весь экран
+tg.expand();
+tg.setHeaderColor('#ffffff'); // Белый хедер
 
-tg.setHeaderColor(tg.themeParams.bg_color || '#ffffff');
+// Логика + / -
 document.querySelectorAll('.js-update-cart').forEach(button => {
     button.addEventListener('click', function(e) {
         e.preventDefault();
@@ -113,16 +446,49 @@ document.querySelectorAll('.js-update-cart').forEach(button => {
         
         fetch(url, {
             method: 'GET',
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            }
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
         })
         .then(response => {
-            // После успешного обновления в БД просто перезагружаем часть страницы 
-            // или всю страницу для обновления итоговых сумм
-            location.reload(); 
+             // Перезагрузка для пересчета сумм
+             location.reload(); 
         });
     });
 });
+
+// Логика удаления при нажатии на красную кнопку (после свайпа)
+function removeItem(btn, itemId) {
+    const url = btn.getAttribute('data-url');
+    const card = document.getElementById('card-' + itemId);
+    
+    // Визуальное удаление
+    card.style.transition = '0.3s';
+    card.style.transform = 'translateX(-100%)';
+    
+    if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
+
+    setTimeout(() => {
+        // Отправка запроса на сервер
+        fetch(url, {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        }).then(() => {
+            location.reload(); // Перезагружаем для пересчета итогов
+        });
+    }, 300);
+}
+
+// Добавь это в конец своего <script>
+window.addEventListener('load', () => {
+    // Проходим по всем карточкам и сбрасываем их скролл влево
+    document.querySelectorAll('.product-cardd').forEach(card => {
+        card.scrollLeft = 0;
+    });
+});
+
+// Дополнительно: закрываем свайп, если пользователь начал скроллить страницу вертикально
+window.addEventListener('scroll', () => {
+    // Это опционально, но делает интерфейс более "нативным"
+}, { passive: true });
 </script>
+</body>
 </html>
