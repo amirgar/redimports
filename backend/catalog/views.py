@@ -381,13 +381,21 @@ from .models import Product, Category
 
 from django.shortcuts import get_object_or_404, render
 from .models import Category, Product
+from django.shortcuts import render, get_object_or_404
+from django.db.models import Min, Max
+from .models import Category, ProductType, Product, Brand
 
 def category_details(request, pk):
-    category = get_object_or_404(ProductType, id=pk)
+    # 1. Получаем категорию по ID
+    category = get_object_or_404(Category, id=pk)
     
-    # 1. Фильтруем то, что SQLite умеет делать (Бренды, Цены, Скидки)
-    products_qs = Product.objects.filter(product_type=category).prefetch_related('images', 'brand')
+    # 2. Получаем все типы продуктов, привязанные к этой категории
+    product_types = ProductType.objects.filter(category=category)
+    
+    # 3. Базовый список товаров для этой категории (через типы продуктов)
+    products_qs = Product.objects.filter(product_type__in=product_types).prefetch_related('images', 'brand')
 
+    # --- Фильтрация ---
     if request.GET.get('discount'):
         products_qs = products_qs.filter(discount_price__isnull=False)
 
@@ -400,10 +408,8 @@ def category_details(request, pk):
     if p_from: products_qs = products_qs.filter(price__gte=p_from)
     if p_to: products_qs = products_qs.filter(price__lte=p_to)
 
-    # 2. Фильтруем JSON-параметры вручную (для совместимости с SQLite)
+    # --- JSON Фильтрация (SQLite-совместимая) ---
     exclude_keys = ['brand', 'discount', 'price_from', 'price_to', 'min_price', 'max_price', 'v', 'q']
-    
-    # Собираем только те фильтры, которые есть в URL и не являются системными
     active_json_filters = {
         k: v for k, v in request.GET.lists() 
         if k not in exclude_keys and v
@@ -411,41 +417,35 @@ def category_details(request, pk):
 
     if active_json_filters:
         filtered_ids = []
-        # Проходим по товарам и проверяем соответствие JSON
         for product in products_qs:
             params = product.parameter_list or {}
             is_match = True
-            
             for key, values in active_json_filters.items():
                 val_in_db = params.get(key)
-                
                 if isinstance(val_in_db, list):
-                    # Если в базе список (например, sizes: ["40", "42"]), ищем пересечение
                     if not any(str(v) in map(str, val_in_db) for v in values):
-                        is_match = False
-                        break
+                        is_match = False; break
                 else:
-                    # Если в базе одиночное значение, проверяем вхождение
                     if str(val_in_db) not in values:
-                        is_match = False
-                        break
-            
+                        is_match = False; break
             if is_match:
                 filtered_ids.append(product.id)
         
-        # Оставляем только те товары, которые прошли проверку
         products = Product.objects.filter(id__in=filtered_ids).prefetch_related('images', 'brand')
     else:
         products = products_qs
 
-    # 3. Данные для фильтров
-    brands = Brand.objects.filter(products__product_type=category).distinct()
-    price_stats = Product.objects.filter(product_type=category).aggregate(
+    # --- Данные для фильтров в шаблоне ---
+    # Бренды берем только те, что есть у товаров данной категории
+    brands = Brand.objects.filter(products__product_type__in=product_types).distinct()
+    
+    # Статистика цен для ползунка
+    price_stats = Product.objects.filter(product_type__in=product_types).aggregate(
         min_p=Min('price'), max_p=Max('price')
     )
 
     context = {
-        'category': category,
+        'category': category,  # Теперь переменная точно определена
         'products': products.distinct(),
         'brands': brands,
         'selected_brands': selected_brands,

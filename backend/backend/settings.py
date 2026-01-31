@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-+q1(7t9!zb50=j1foy%)d6k(sz#zc_f6p2k63_sxygc%8yz*o&"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     "redimports-django-garam.amvera.io",
