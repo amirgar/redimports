@@ -6,50 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Red Imports Store - Корзина</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <link rel="stylesheet" href="{% static 'catalog/css/style.css' %}?v=5.2">
 
     <style>
-        /* --- ГЛОБАЛЬНЫЕ НАСТРОЙКИ СКРОЛЛА --- */
-        html {
-            height: 100%;
-            /* Запрещаем горизонтальный скролл всей страницы */
-            overflow-x: hidden; 
-        }
-
+        /* --- БАЗОВЫЙ СЛОЙ --- */
         body {
             background-color: #F9F9F9;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            padding: 0;
-            /* Разрешаем вертикальный скролл и делаем его плавным */
-            height: 100%;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .cart-page {
-            /* Контейнер должен растягиваться контентом */
-            min-height: 100%;
-            padding-bottom: 120px; /* Большой отступ снизу, чтобы кнопка не перекрывала последний товар */
-            padding-top: 60px; /* Вместо <br><br><br> */
-            box-sizing: border-box;
-        }
-
-        /* --- ХЕДЕР --- */
         .header {
             padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
             background: #fff;
-            position: fixed; /* Фиксируем хедер */
+            position: sticky;
             top: 0;
-            left: 0;
-            width: 100%;
-            box-sizing: border-box;
             z-index: 100;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid #eee;
         }
         
         .header .back-link {
@@ -62,66 +39,23 @@
             gap: 5px;
         }
 
-        /* --- СТИЛИ ПУСТОЙ КОРЗИНЫ --- */
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 60vh;
-            text-align: center;
-        }
-        .empty-state h1 { font-size: 22px; font-weight: 700; text-transform: uppercase; margin-bottom: 10px; }
-        .empty-state p { color: #888; font-size: 14px; line-height: 1.5; }
-        .empty-state a { color: #FF3B30; text-decoration: none; }
-
-        .bottom-red-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #FF3B30;
-            color: white;
-            padding: 15px 0;
-            text-align: center;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 16px;
-            padding-bottom: calc(15px + env(safe-area-inset-bottom));
-            z-index: 101;
-        }
-
-        /* --- КАРТОЧКА ТОВАРА (СВАЙП) --- */
-        .cart-actions {
-            padding: 0 20px 15px 20px;
-            color: #888;
-            font-size: 14px;
-        }
-
-        /* Контейнер карточки */
+        /* --- КАРТОЧКА С РОБОЧИМ СВАЙПОМ --- */
         .product-cardd {
             display: flex;
-            width: 100%;
-            overflow-x: auto; /* Горизонтальный скролл */
-            scroll-snap-type: x mandatory; /* Магнит */
-            background: #fff;
-            margin-bottom: 15px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
             scrollbar-width: none; 
             -ms-overflow-style: none;
-            
-            /* !ВАЖНО! Это разрешает вертикальный скролл страницы, когда палец на карточке */
+            background: transparent;
+            margin-bottom: 12px;
+            /* Разрешаем вертикальный скролл страницы */
             touch-action: pan-y; 
         }
+
         .product-cardd::-webkit-scrollbar { display: none; }
 
-        /* Применяем это ко всем детям, чтобы они не блокировали скролл */
-        .product-cardd * {
-            touch-action: pan-y;
-        }
-
-        /* Основной контент (Видим сразу) */
         .card-main-content {
-            flex: 0 0 100%; /* Жестко 100% ширины */
+            flex: 0 0 100%;
             width: 100%;
             background: #fff;
             padding: 15px;
@@ -129,13 +63,12 @@
             display: flex;
             gap: 15px;
             scroll-snap-align: start;
-            position: relative;
-            z-index: 2;
+            /* Внутри карточки тоже разрешаем свайп вверх/вниз */
+            touch-action: pan-y;
         }
 
-        /* Кнопка удаления (Скрыта справа) */
         .delete-action-btn {
-            flex: 0 0 80px; /* Жесткая ширина кнопки */
+            flex: 0 0 80px;
             background-color: #FF3B30;
             display: flex;
             align-items: center;
@@ -143,277 +76,180 @@
             scroll-snap-align: end;
             border: none;
             cursor: pointer;
-            z-index: 1;
-            /* Для кнопки удаления оставляем возможность нажатия */
-            touch-action: manipulation; 
         }
 
-        /* Внутрянка карточки */
+        /* Анимация схлопывания при удалении */
+        .card-collapsing {
+            transition: all 0.3s ease;
+            max-height: 0 !important;
+            margin-bottom: 0 !important;
+            opacity: 0 !important;
+            overflow: hidden !important;
+        }
+
+        /* --- ВНУТРЕННИЕ ЭЛЕМЕНТЫ --- */
         .img-wrapper {
-            width: 90px;
-            height: 90px;
+            width: 90px; height: 90px;
             background-color: #F2F2F2;
             border-radius: 8px;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
-        .img-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            mix-blend-mode: multiply;
-        }
+        .img-wrapper img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-mode: multiply; }
 
-        .info {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        .top-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
+        .info { flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        .top-row { display: flex; justify-content: space-between; }
         .price { font-weight: 600; font-size: 16px; font-family: T2-Reg; }
         .checkbox-custom { width: 20px; height: 20px; accent-color: #000; }
-        .brand { font-size: 12px; color: #888; margin: 2px 0; text-transform: uppercase; font-family: T2-Reg; }
-        .name { font-size: 14px; color: #000; margin: 0; line-height: 1.2; max-width: 180px; font-family: T2-Reg; }
-        .meta { font-size: 12px; color: #888; margin-top: 4px; font-family: T2-Reg; }
+        
+        .brand { font-size: 12px; color: #888; text-transform: uppercase; font-family: T2-Reg; }
+        .name { font-size: 14px; margin: 0; line-height: 1.2; font-family: T2-Reg; }
+        .meta { font-size: 12px; color: #888; font-family: T2-Reg; }
 
         .controls {
-            display: flex;
-            align-items: center;
-            background: #F2F2F2;
-            border-radius: 6px;
-            width: fit-content;
-            margin-top: 8px;
-            padding: 2px;
+            display: flex; align-items: center; background: #F2F2F2;
+            border-radius: 6px; width: fit-content; padding: 2px;
         }
-        .controls button {
-            background: none;
-            border: none;
-            font-size: 16px;
-            width: 30px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .controls span {
-            font-size: 14px;
-            font-weight: 500;
-            min-width: 20px;
-            text-align: center;
-            font-family: T2-Reg;
-        }
+        .controls button { background: none; border: none; width: 30px; height: 24px; cursor: pointer; }
+        .controls span { font-size: 14px; min-width: 20px; text-align: center; font-family: T2-Reg; }
 
-        /* --- ИТОГИ --- */
-        .total-block {
-            background: #fff;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .total-block h3 { font-size: 18px; margin: 0 0 15px 0; font-family: T2-Reg; }
-        .row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 14px;
-            color: #333;
-            font-family: T2-Reg;
-        }
-        .row.final {
-            margin-top: 15px;
-            font-size: 18px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
+        /* --- ИТОГИ И КНОПКА --- */
+        .total-block { background: #fff; padding: 20px; margin-top: 10px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 8px; font-family: T2-Reg; font-size: 14px; }
+        .final { border-top: 1px solid #eee; padding-top: 15px; font-size: 18px; font-weight: bold; }
         .pink-text { color: #FF3B30; }
 
         .submit-btn {
-            background-color: #FF3B30;
-            color: white;
-            width: 100%;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 0;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            display: flex;
-            justify-content: space-between;
-            padding-left: 20px;
-            padding-right: 20px;
+            background-color: #FF3B30; color: white; width: 100%; border: none;
+            padding: 15px 20px; font-size: 16px; font-weight: 600;
+            position: fixed; bottom: 0; left: 0;
+            display: flex; justify-content: space-between;
             padding-bottom: calc(15px + env(safe-area-inset-bottom));
             z-index: 101;
         }
+
+        .cart-content { padding-bottom: 120px; }
     </style>
 </head>
 <body>
-    
-    <div class="cart-page">
-        <header class="header">
-            <a href="javascript:history.back()" class="back-link">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="15 18 9 12 15 6"></polyline>
-                </svg>
-                корзина
-            </a>
-        </header>
 
-        {% if cart.items.exists %}
-            <div class="cart-content">
-                <div class="cart-actions">
-                    <div style="display:flex; align-items:center; gap:5px;">
-                        Количество товаров: {{ cart.items.count }}
-                    </div>
-                </div>
+<div class="cart-page">
+    <header class="header">
+        <a href="javascript:history.back()" class="back-link">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+            корзина
+        </a>
+    </header>
 
-                {% for item in cart.items.all %}
-                <div class="product-cardd" id="card-{{ item.id }}">
-                    
-                    <div class="card-main-content">
-                        <div class="img-wrapper">
-                            {% if item.product.images.exists %}
-                                <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
-                            {% else %}
-                                <img src="{% static 'catalog/img/no-image.png' %}" alt="No image">
-                            {% endif %}
-                        </div>
-                        
-                        <div class="info">
-                            <div class="top-row">
-                                <span class="price">
-                                    {% if item.product.discount_price %}
-                                        {{ item.product.discount_price }} ₽
-                                    {% else %}
-                                        {{ item.product.price }} ₽
-                                    {% endif %}
-                                </span>
-                                <input type="checkbox" class="checkbox-custom" checked>
-                            </div>
-                            
-                            <div class="details">
-                                <p class="brand">{{ item.product.brand.name }}</p>
-                                <p class="name">{{ item.product.name }}</p>
-                                <p class="meta">{{ item.selected_params|default:"RUS 35 белый" }}</p>
-                            </div>
-
-                            <div class="controls">
-                                <button class="minus js-update-cart" data-url="{% url 'update_cart' item.id 'minus' %}">−</button>
-                                <span class="qty" id="qty-{{ item.id }}">{{ item.quantity }}</span>
-                                <button class="plus js-update-cart" data-url="{% url 'update_cart' item.id 'plus' %}">+</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button class="delete-action-btn js-remove-cart" data-url="{% url 'remove_from_cart' item.id %}" onclick="removeItem(this, '{{ item.id }}')">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                        </svg>
-                    </button>
-                </div>
-                {% endfor %}
-
-                <div class="total-block">
-                    <h3>сумма заказа</h3>
-                    <div class="row">
-                        <span>{{ cart.items.count }} товаров</span>
-                        <span>{{ cart.total_base_price }} ₽</span>
-                    </div>
-                    
-                    <div class="row">
-                        <span>доставка</span>
-                        <span>1 000 ₽</span>
-                    </div>
-
-                    {% if cart.total_discount > 0 %}
-                    <div class="row pink-text">
-                        <span>скидка</span>
-                        <span>-{{ cart.total_discount }} ₽</span>
-                    </div>
-                    {% endif %}
-                    
-                    <div class="row pink-text">
-                         <span>Скидка <span style="font-size:10px;"></span></span>
-                         <span>-10 000 ₽</span>
-                    </div>
-
-                    <div class="row final">
-                        <strong>итого</strong>
-                        <strong>{{ cart.total_final_price }} ₽</strong>
-                    </div>
-                </div>
+    {% if cart.items.exists %}
+        <div class="cart-content">
+            <div style="padding: 15px 20px; color: #888; font-size: 14px;">
+                Количество товаров: {{ cart.items.count }}
             </div>
 
-            <button class="submit-btn" onclick="location.href='#'">
-                <span style="font-family: T2-Reg;">оформить</span>
-                <span style="font-family: T2-Reg;">{{ cart.total_final_price }} ₽</span>
-            </button>
+            {% for item in cart.items.all %}
+            <div class="product-cardd" id="card-{{ item.id }}">
+                <div class="card-main-content">
+                    <div class="img-wrapper">
+                        {% if item.product.images.exists %}
+                            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <img src="{% static 'catalog/img/no-image.png' %}" alt="No image">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="info">
+                        <div class="top-row">
+                            <span class="price">{% if item.product.discount_price %}{{ item.product.discount_price }}{% else %}{{ item.product.price }}{% endif %} ₽</span>
+                            <input type="checkbox" class="checkbox-custom" checked>
+                        </div>
+                        <div>
+                            <p class="brand">{{ item.product.brand.name }}</p>
+                            <p class="name">{{ item.product.name }}</p>
+                            <p class="meta">{{ item.selected_params|default:"RUS 35 белый" }}</p>
+                        </div>
+                        <div class="controls">
+                            <button class="js-update-cart" data-url="{% url 'update_cart' item.id 'minus' %}">−</button>
+                            <span id="qty-{{ item.id }}">{{ item.quantity }}</span>
+                            <button class="js-update-cart" data-url="{% url 'update_cart' item.id 'plus' %}">+</button>
+                        </div>
+                    </div>
+                </div>
 
-        {% else %}
-            <div class="empty-state">
-                <h1>ТУТ ПОКА ПУСТО</h1>
-                <p>для выбора товаров<br>перейдите в <a href="{% url 'catalog' %}">каталог</a></p>
-                
-                <a href="{% url 'orders' %}" class="bottom-red-bar">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" style="margin-right: 8px; vertical-align: middle;">
-                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                <button class="delete-action-btn" onclick="removeItem(this, '{{ item.id }}', '{% url 'remove_from_cart' item.id %}')">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                        <polyline points="3 6 5 6 21 6"></polyline>
+                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
                     </svg>
-                    к заказам
-                </a>
+                </button>
             </div>
-        {% endif %}
-    </div>
+            {% endfor %}
+
+            <div class="total-block">
+                <h3>сумма заказа</h3>
+                <div class="row"><span>{{ cart.items.count }} товаров</span><span>{{ cart.total_base_price }} ₽</span></div>
+                <div class="row"><span>доставка</span><span>1 000 ₽</span></div>
+                {% if cart.total_discount > 0 %}
+                <div class="row pink-text"><span>скидка</span><span>-{{ cart.total_discount }} ₽</span></div>
+                {% endif %}
+                <div class="row final"><strong>итого</strong><strong>{{ cart.total_final_price }} ₽</strong></div>
+            </div>
+        </div>
+
+        <button class="submit-btn" onclick="location.href='#'">
+            <span style="font-family: T2-Reg;">оформить</span>
+            <span style="font-family: T2-Reg;">{{ cart.total_final_price }} ₽</span>
+        </button>
+    {% else %}
+        <div class="empty-state">
+            <h1>ТУТ ПОКА ПУСТО</h1>
+            <p>для выбора товаров<br>перейдите в <a href="{% url 'catalog' %}">каталог</a></p>
+        </div>
+    {% endif %}
+</div>
 
 <script>
 const tg = window.Telegram.WebApp;
 tg.expand();
-tg.setHeaderColor('#ffffff');
 
-document.querySelectorAll('.js-update-cart').forEach(button => {
-    button.addEventListener('click', function(e) {
-        e.preventDefault();
-        const url = this.getAttribute('data-url');
-        fetch(url, {
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        }).then(response => location.reload());
-    });
+// Обновление количества
+document.querySelectorAll('.js-update-cart').forEach(btn => {
+    btn.onclick = function() {
+        fetch(this.dataset.url).then(() => location.reload());
+    };
 });
 
-function removeItem(btn, itemId) {
-    const url = btn.getAttribute('data-url');
+// ПРАВИЛЬНОЕ УДАЛЕНИЕ
+function removeItem(btn, itemId, url) {
     const card = document.getElementById('card-' + itemId);
     
-    card.style.transition = '0.3s';
-    card.style.transform = 'translateX(-100%)';
+    // 1. Убираем магнит (snap), чтобы он не мешал анимации
+    card.style.scrollSnapType = 'none';
     
+    // 2. Анимируем уезд карточки влево до упора
+    card.scrollTo({
+        left: card.scrollWidth,
+        behavior: 'smooth'
+    });
+
     if(tg.HapticFeedback) tg.HapticFeedback.notificationOccurred('success');
 
+    // 3. Через 300мс схлопываем высоту и удаляем
     setTimeout(() => {
-        fetch(url, {
-            method: 'GET',
-            headers: { 'X-Requested-With': 'XMLHttpRequest' }
-        }).then(() => location.reload());
-    }, 300);
+        card.classList.add('card-collapsing');
+        
+        setTimeout(() => {
+            fetch(url).then(() => location.reload());
+        }, 300);
+    }, 200);
 }
 
-// Принудительный сброс скролла карточек при загрузке
-window.addEventListener('load', () => {
-    document.querySelectorAll('.product-cardd').forEach(card => {
-        card.scrollLeft = 0;
-    });
-});
+// Фикс: всегда сбрасываем скролл карточек влево при старте
+window.onload = () => {
+    document.querySelectorAll('.product-cardd').forEach(c => c.scrollLeft = 0);
+};
 </script>
 </body>
 </html>
