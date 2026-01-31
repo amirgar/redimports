@@ -2637,14 +2637,14 @@ input:checked + .slider:before { transform: translateX(20px); }
     background: #f5f5f5;
 }
 
-.product-card {
+.product-cardd {
     display: flex;
     background: white;
     padding: 15px;
     margin-bottom: 2px;
 }
 
-.product-card img {
+.product-cardd img {
     width: 100px;
     height: 100px;
     object-fit: contain;

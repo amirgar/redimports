@@ -29,7 +29,7 @@
                 </div>
 
                 {% for item in cart.items.all %}
-                <div class="product-card">
+                <div class="product-cardd">
                     <div class="img-wrapper">
                         {% if item.product.images.exists %}
                             <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
