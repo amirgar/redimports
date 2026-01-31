@@ -210,7 +210,11 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(default=1)
     # Поле для хранения выбранных параметров (размер, цвет)
     selected_params = models.CharField(max_length=255, blank=True, null=True) 
+    size = models.CharField(max_length=50, null=True, blank=True) # Добавляем это поле
 
+    # class Meta:
+    #     # Это гарантирует, что товар + размер будут уникальной парой в корзине
+    #     unique_together = ('cart', 'product', 'size')
     def total_price(self):
         # Если есть discount_price, берем её, иначе обычную
         price = self.product.discount_price if self.product.discount_price else self.product.price

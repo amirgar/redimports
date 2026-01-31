@@ -85,7 +85,7 @@
             </div>
             <div class="size-scroll-list">
                 {% for size in sizes %}
-                    <button class="size-item{% if forloop.first %} selected{% endif %}">
+                    <button class="size-item{% if forloop.first %} selected{% endif %}" data-size="{{ size }}">
                         {{ size }}
                     </button>
                 {% endfor %}
@@ -306,31 +306,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const textSpan = btn.querySelector('.btn-text');
         const url = btn.getAttribute('data-url');
 
-        // Вибрация (для ощущения нажатия)
+        // 1. Находим выбранный размер
+        const selectedSizeBtn = document.querySelector('.size-item.selected');        
+        const selectedSize = selectedSizeBtn ? selectedSizeBtn.dataset.size : "-";
+
         if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
 
+        // 2. Добавляем размер в FormData
+        const formData = new URLSearchParams();
+        formData.append('size', selectedSize);
+
         fetch(url, {
-            method: 'POST', // Используем POST для изменения данных
+            method: 'POST',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRFToken': getCookie('csrftoken'), // Функция getCookie должна быть у тебя в base/home
-            }
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/x-www-form-urlencoded', // Важно для передачи FormData
+            },
+            body: formData.toString()
         })
         .then(response => {
-            if (response.ok) {
-                return response.json();
-            } else if (response.status === 401) {
-                alert("Пожалуйста, перезапустите приложение для авторизации");
-                throw new Error('Unauthorized');
-            }
+            if (response.ok) return response.json();
+            if (response.status === 401) alert("Нужна авторизация");
         })
         .then(data => {
             if (data && data.status === 'added') {
-                // Визуальный эффект успеха
-                btn.style.backgroundColor = '#4CD964'; // Зеленый
+                btn.style.backgroundColor = '#4CD964';
                 textSpan.innerText = 'добавлено ✓';
-                
-                // Через 2 секунды возвращаем как было
                 setTimeout(() => {
                     btn.style.backgroundColor = ''; 
                     textSpan.innerText = 'в корзину +';
@@ -339,7 +341,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .catch(error => console.error('Error:', error));
     });
-
     // Хелпер для получения CSRF токена (если его нет в main.js)
     function getCookie(name) {
         let cookieValue = null;

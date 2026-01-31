@@ -597,30 +597,27 @@ def get_tg_user(request):
 
 @csrf_exempt  # Отключаем строгую проверку CSRF для тестов, но лучше оставить getCookie в JS
 def add_to_cart(request, product_id):
-    user = get_tg_user(request)
-    
-    # Если юзер не найден — возвращаем ошибку 401
-    if not user:
-        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+    if request.method == 'POST':
+        # Если размер не пришел из JS, ставим None или пустую строку
+        size = request.POST.get('size') 
+        if not size or size == "undefined":
+            size = "-" # Или None, в зависимости от того, как настроена модель
 
-    product = get_object_or_404(Product, id=product_id)
-    
-    # Создаем/получаем корзину для ЭТОГО юзера
-    cart, _ = Cart.objects.get_or_create(user=user)
-    
-    # Добавляем товар
-    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
-    
-    if not created:
-        cart_item.quantity += 1
-        cart_item.save()
-    
-    # Если запрос пришел через JS (fetch)
-    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        return JsonResponse({'status': 'added', 'total_items': cart.items.count()})
+        product = get_object_or_404(Product, id=product_id)
+        cart, _ = Cart.objects.get_or_create(user=request.user)
         
-    # Если вдруг переход по прямой ссылке
-    return redirect('cart_detail')
+        # Теперь ищем товар в корзине с учетом того, что размера может не быть
+        item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product=product,
+            size=size
+        )
+        
+        if not created:
+            item.quantity += 1
+            item.save()
+            
+        return JsonResponse({'status': 'added', 'size': size})
 
 def cart_detail(request):
     user = get_tg_user(request)

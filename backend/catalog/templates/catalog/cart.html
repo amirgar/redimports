@@ -131,6 +131,61 @@
             height: 20px;
             accent-color: #000;
         }
+
+        .empty-state {
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            justify-content: center;
+
+            height: 70vh; /* Почти на весь экран */
+
+            text-align: center;
+
+            }
+
+
+
+            .empty-state h1 {
+
+            font-size: 22px;
+
+            font-weight: 700;
+
+            text-transform: uppercase;
+
+            color: #000;
+
+            margin-bottom: 10px;
+
+            }
+
+
+
+            .empty-state p {
+
+            color: #888;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+
+            }
+
+
+
+            .empty-state a {
+
+            color: #FF3B30; /* Красный цвет */
+
+            text-decoration: none;
+
+            }
+
     </style>
 </head>
 <body>
@@ -138,6 +193,7 @@
 <br>
 <br>
 <div class="cart-page">
+    {% if cart.items.exists %}
     <div style="padding: 20px 20px 10px;">
         <a href="javascript:history.back()" class="back-link" style="text-decoration: none;">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -147,7 +203,7 @@
         </a>
     </div>
 
-    {% for item in cart.items.all %}
+    {% for item in cart_items %}    
     <div class="product-cardd" id="card-{{ item.id }}">
         <button class="delete-btn" onclick="confirmDelete('{{ item.id }}', '{% url 'remove_from_cart' item.id %}')">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -168,11 +224,10 @@
                     <span class="price">
                         {% if item.product.discount_price %}{{ item.product.discount_price }}{% else %}{{ item.product.price }}{% endif %} ₽
                     </span>
-                    <input type="checkbox" checked>
                 </div>
                 <div style="font-size: 14px; color: #888; text-transform: uppercase;">{{ item.product.brand.name }}</div>
                 
-                <div style="font-size: 13px; color: #000; margin: 2px 0;">Размер: {{ item.selected_size|default:"38" }}</div>
+                <div style="font-size: 13px; color: #000; margin: 2px 0;">Размер: {{ item.size|default:"-" }}</div>
                 
                 <div style="font-size: 14px; margin-bottom: 5px;">{{ item.product.name }}</div>
                 <div class="controls">
@@ -196,8 +251,19 @@
         <span>оформить</span>
         <span>{{ cart.total_final_price }} ₽</span>
     </button>
-</div>
+    {% else %}
 
+    <div class="empty-state">
+
+    <h1>ТУТ ПОКА ПУСТО</h1>
+
+    <p>для выбора товаров<br>перейдите в <a href="{% url 'catalog' %}">каталог</a></p>
+
+
+    </div>
+
+    {% endif %}
+</div>
 <script>
     const tg = window.Telegram.WebApp;
     tg.expand();
