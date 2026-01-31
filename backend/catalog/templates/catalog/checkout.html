@@ -183,82 +183,103 @@
     </div>
 
     <script>
-        const tg = window.Telegram.WebApp;
-        let currentStep = 1;
+    const tg = window.Telegram.WebApp;
+    let currentStep = 1;
 
-        function nextStep(step) {
-            // Валидация (минимум)
-            if (step === 2 && document.getElementById('phone').value === "") {
-                tg.showAlert("Пожалуйста, заполните телефон");
-                return;
-            }
-
-            document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-            
-            if (step === 2) {
-                document.getElementById('step2').classList.add('active');
-                document.getElementById('progressBar').style.width = '66%';
-            } else if (step === 3) {
-                document.getElementById('step3').classList.add('active');
-                document.getElementById('progressBar').style.width = '100%';
-            }
-            currentStep = step;
-            window.scrollTo(0,0);
-        }
-
-        function prevStep() {
-            if (currentStep === 1) {
-                window.history.back();
-                return;
-            }
-            nextStep(currentStep - 1);
-        }
-
-        function selectRadio(el, val) {
-            document.querySelectorAll('.radio-item').forEach(item => item.classList.remove('selected'));
-            el.classList.add('selected');
-        }
-
-        function finishOrder() {
-            // Собираем данные из полей ввода
-            const orderData = {
-                first_name: document.getElementById('fname').value,
-                last_name: document.getElementById('lname').value,
-                middle_name: document.getElementById('mname').value,
-                phone: document.getElementById('phone').value,
-                address: document.getElementById('city').value,
-                delivery_method: document.querySelector('.radio-item.selected span').innerText === 'самовывоз' ? 'pickup' : 'point', // Соответствует DELIVERY_CHOICES
-                payment_method: 'card', // Или добавь выбор на 3-м шаге
-            };
-
-            // Отправляем на сервер
-            fetch('/api/order/create/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken'), // Не забудь функцию получения куки
-                },
-                body: JSON.stringify(orderData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    tg.HapticFeedback.notificationOccurred('success');
-                    // Показываем утку только при успешном ответе сервера
-                    document.getElementById('mainHeader').style.display = 'none';
-                    document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
-                    document.getElementById('stepSuccess').classList.add('active');
-                } else {
-                    tg.showAlert("Ошибка при сохранении заказа");
+    // ВАЖНО: Добавили функцию получения токена, без неё fetch не работает
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
                 }
-            });
+            }
         }
+        return cookieValue;
+    }
 
-        function selectDate() {
-            // Имитация выбора даты
-            document.getElementById('deliveryDate').value = "завтра, 12 октября";
+    function nextStep(step) {
+        if (step === 2 && document.getElementById('phone').value === "") {
+            tg.showAlert("Пожалуйста, заполните телефон");
+            return;
         }
+        document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+        if (step === 2) {
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('progressBar').style.width = '66%';
+        } else if (step === 3) {
+            document.getElementById('step3').classList.add('active');
+            document.getElementById('progressBar').style.width = '100%';
+        }
+        currentStep = step;
+        window.scrollTo(0,0);
+    }
 
-        tg.expand();
-    </script>
+    function prevStep() {
+        if (currentStep === 1) {
+            window.history.back();
+            return;
+        }
+        nextStep(currentStep - 1);
+    }
+
+    function selectRadio(el, val) {
+        document.querySelectorAll('.radio-item').forEach(item => item.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+
+    function finishOrder() {
+        console.log("Начало оформления заказа...");
+        
+        const orderData = {
+            first_name: document.getElementById('fname').value,
+            last_name: document.getElementById('lname').value,
+            middle_name: document.getElementById('mname').value,
+            phone: document.getElementById('phone').value,
+            address: document.getElementById('city').value,
+            delivery_method: document.querySelector('.radio-item.selected span').innerText === 'самовывоз' ? 'pickup' : 'point',
+            payment_method: 'card',
+        };
+
+        // Проверка перед отправкой
+        console.log("Данные заказа:", orderData);
+
+        fetch('/api/order/create/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken'),
+            },
+            body: JSON.stringify(orderData)
+        })
+        .then(response => {
+            console.log("Ответ сервера:", response.status);
+            if (response.ok) {
+                tg.HapticFeedback.notificationOccurred('success');
+                document.getElementById('mainHeader').style.display = 'none';
+                document.querySelectorAll('.step-container').forEach(el => el.classList.remove('active'));
+                document.getElementById('stepSuccess').classList.add('active');
+            } else {
+                return response.json().then(data => {
+                    tg.showAlert("Ошибка: " + JSON.stringify(data));
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Ошибка запроса:", err);
+            tg.showAlert("Критическая ошибка при отправке запроса");
+        });
+    }
+
+    function selectDate() {
+        document.getElementById('deliveryDate').value = "завтра, 12 октября";
+    }
+
+    tg.expand();
+</script>
 </body>
 </html>
