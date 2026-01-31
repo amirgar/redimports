@@ -623,14 +623,20 @@ def cart_detail(request):
     user = get_tg_user(request)
     
     if not user:
-        # Если юзер не определен, показываем пустую страницу или просим перезайти
-        # Но чтобы не ломать верстку, передадим пустую корзину (None)
-        return render(request, 'catalog/cart.html', {'cart': None})
+        return render(request, 'catalog/cart.html', {'cart': None, 'cart_items': []})
 
-    # Получаем корзину конкретного юзера
+    # Получаем корзину
     cart, created = Cart.objects.get_or_create(user=user)
     
-    return render(request, 'catalog/cart.html', {'cart': cart})
+    # Получаем товары корзины (важно для цикла в HTML)
+    cart_items = cart.items.all() 
+
+    context = {
+        'cart': cart,
+        'cart_items': cart_items, # Добавляем эту строку
+    }
+    
+    return render(request, 'catalog/cart.html', context)
 
 # Также обнови update_cart и remove_from_cart, чтобы использовали get_tg_user
 def update_cart(request, item_id, action):
