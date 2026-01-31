@@ -230,3 +230,5 @@ class SiteSettings(models.Model):
 
     def __clstr__(self):
         return "Настройки сайта"
+    
+    

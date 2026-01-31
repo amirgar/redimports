@@ -262,7 +262,7 @@ def home(request):
     if tg_id:
         favorite_ids = Favorite.objects.filter(user__telegram_id=tg_id).values_list('product_id', flat=True)
     settings = SiteSettings.objects.first()
-    
+
     return render(request, 'catalog/home.html', {
         'categories': categories,
         'categories_count': categories_count,
