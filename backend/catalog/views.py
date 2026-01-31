@@ -572,20 +572,76 @@ def cart_view(request):
     }
     return render(request, 'catalog/cart.html', context)
 
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+# В catalog/views.py
+
+from django.shortcuts import get_object_or_404, redirect, render
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import get_user_model
 from .models import Product, Cart, CartItem
 
-@login_required
+User = get_user_model()
+
+# Вспомогательная функция, чтобы найти юзера надежно
+def get_tg_user(request):
+    # 1. Если стандартная авторизация сработала
+    if request.user.is_authenticated:
+        return request.user
+    
+    # 2. Если нет, ищем по telegram_id в сессии (запасной вариант)
+    tg_id = request.session.get('telegram_id')
+    if tg_id:
+        return User.objects.filter(telegram_id=tg_id).first()
+    
+    return None
+
+@csrf_exempt  # Отключаем строгую проверку CSRF для тестов, но лучше оставить getCookie в JS
+def add_to_cart(request, product_id):
+    user = get_tg_user(request)
+    
+    # Если юзер не найден — возвращаем ошибку 401
+    if not user:
+        return JsonResponse({'status': 'error', 'message': 'Unauthorized'}, status=401)
+
+    product = get_object_or_404(Product, id=product_id)
+    
+    # Создаем/получаем корзину для ЭТОГО юзера
+    cart, _ = Cart.objects.get_or_create(user=user)
+    
+    # Добавляем товар
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    
+    if not created:
+        cart_item.quantity += 1
+        cart_item.save()
+    
+    # Если запрос пришел через JS (fetch)
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'added', 'total_items': cart.items.count()})
+        
+    # Если вдруг переход по прямой ссылке
+    return redirect('cart_detail')
+
 def cart_detail(request):
-    # Получаем корзину пользователя или создаем новую, если её нет
-    cart, created = Cart.objects.get_or_create(user=request.user)
+    user = get_tg_user(request)
+    
+    if not user:
+        # Если юзер не определен, показываем пустую страницу или просим перезайти
+        # Но чтобы не ломать верстку, передадим пустую корзину (None)
+        return render(request, 'catalog/cart.html', {'cart': None})
+
+    # Получаем корзину конкретного юзера
+    cart, created = Cart.objects.get_or_create(user=user)
+    
     return render(request, 'catalog/cart.html', {'cart': cart})
 
-@login_required
+# Также обнови update_cart и remove_from_cart, чтобы использовали get_tg_user
 def update_cart(request, item_id, action):
-    # Находим конкретный пункт в корзине
-    item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    user = get_tg_user(request)
+    if not user: return redirect('home') # Или ошибка
+
+    # Важно: фильтруем CartItem через cart__user=user, чтобы нельзя было менять чужую корзину
+    item = get_object_or_404(CartItem, id=item_id, cart__user=user)
     
     if action == 'plus':
         item.quantity += 1
@@ -593,29 +649,16 @@ def update_cart(request, item_id, action):
         if item.quantity > 1:
             item.quantity -= 1
         else:
-            item.delete() # Удаляем, если количество стало 0
+            item.delete()
             return redirect('cart_detail')
     
     item.save()
     return redirect('cart_detail')
 
-@login_required
 def remove_from_cart(request, item_id):
-    item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
+    user = get_tg_user(request)
+    if not user: return redirect('home')
+
+    item = get_object_or_404(CartItem, id=item_id, cart__user=user)
     item.delete()
-    return redirect('cart_detail')
-
-
-@login_required
-def add_to_cart(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-    cart, created = Cart.objects.get_or_create(user=request.user)
-    cart_item, item_created = CartItem.objects.get_or_create(
-        cart=cart, 
-        product=product
-    )
-    
-    if not item_created:
-        cart_item.quantity += 1
-        cart_item.save()
     return redirect('cart_detail')

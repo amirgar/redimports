@@ -138,8 +138,8 @@
 </div>
 
 <div class="sticky-add-to-cart">
-    <button class="add-btn">
-        <span>в корзину +</span>
+    <button class="add-btn js-add-to-cart" data-url="{% url 'add_to_cart' product.id %}">
+        <span class="btn-text">в корзину +</span>
     </button>
 </div>
 <br>
@@ -296,6 +296,66 @@ function getCookie(name) {
     }
     return cookieValue;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const tg = window.Telegram.WebApp;
+
+    document.querySelector('.js-add-to-cart').addEventListener('click', function(e) {
+        e.preventDefault();
+        const btn = this;
+        const textSpan = btn.querySelector('.btn-text');
+        const url = btn.getAttribute('data-url');
+
+        // Вибрация (для ощущения нажатия)
+        if(tg.HapticFeedback) tg.HapticFeedback.impactOccurred('medium');
+
+        fetch(url, {
+            method: 'POST', // Используем POST для изменения данных
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': getCookie('csrftoken'), // Функция getCookie должна быть у тебя в base/home
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else if (response.status === 401) {
+                alert("Пожалуйста, перезапустите приложение для авторизации");
+                throw new Error('Unauthorized');
+            }
+        })
+        .then(data => {
+            if (data && data.status === 'added') {
+                // Визуальный эффект успеха
+                btn.style.backgroundColor = '#4CD964'; // Зеленый
+                textSpan.innerText = 'добавлено ✓';
+                
+                // Через 2 секунды возвращаем как было
+                setTimeout(() => {
+                    btn.style.backgroundColor = ''; 
+                    textSpan.innerText = 'в корзину +';
+                }, 2000);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    });
+
+    // Хелпер для получения CSRF токена (если его нет в main.js)
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
 </script>
 </body>
 </html>
